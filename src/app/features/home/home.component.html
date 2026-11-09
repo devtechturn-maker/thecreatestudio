@@ -1,0 +1,204 @@
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="blob blob--purple hero__blob1 float" aria-hidden="true"></div>
+  <div class="blob blob--blue hero__blob2 float float--slow" aria-hidden="true"></div>
+  <div class="hero__grid" aria-hidden="true"></div>
+
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <p class="eyebrow" data-hero-fade>Digital Marketing · Websites · Mobile Apps</p>
+      <h1 id="hero-title" class="display-xl hero__title">
+        <span class="line"><span>WE CREATE.</span></span>
+        <span class="line"><span class="grad-text">YOU GROW.</span></span>
+      </h1>
+      <p class="hero__support" data-hero-fade>Your Ideas. Our Creativity. Unlimited Digital Possibilities.</p>
+      <p class="lead" data-hero-fade>
+        We help brands grow through creative digital marketing, powerful websites, and innovative mobile applications.
+        One creative partner. Complete digital solutions.
+      </p>
+      <div class="btn-row" data-hero-fade>
+        <a routerLink="/contact" class="btn btn--primary" appMagnetic>Let's Talk <app-icon name="arrow" [size]="18" /></a>
+        <a routerLink="/work" class="btn btn--ghost" appMagnetic>Explore Our Work</a>
+      </div>
+    </div>
+    <app-hero-visual class="hero__visual" data-hero-fade />
+  </div>
+
+  <div class="hero__scroll" data-hero-fade aria-hidden="true"><span></span>Scroll</div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    @for (m of marquee; track m) { <span>{{ m }}</span> }
+    @for (m of marquee; track m) { <span>{{ m }}</span> }
+  </div>
+</div>
+
+<!-- INTRO STATEMENT -->
+<section class="section intro">
+  <div class="container">
+    <p class="eyebrow" appReveal="fade">Who we are</p>
+    <h2 class="intro__text" appReveal>
+      We create digital experiences that make brands grow — <span class="muted">two expert divisions, one creative partner.</span>
+    </h2>
+    <div class="intro__claims">
+      <p appReveal><span class="grad-text">→</span> We grow brands through digital marketing.</p>
+      <p appReveal [revealDelay]="0.1"><span class="grad-text">→</span> We build powerful websites and mobile applications.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DIVISIONS -->
+<section class="section section--alt" aria-labelledby="div-title">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <h2 id="div-title" class="h2" appReveal="mask"><span class="line"><span>Two divisions.</span></span><span class="line"><span class="muted">Equal obsession.</span></span></h2>
+      <p class="lead" appReveal>Whether you need an audience or a product, we have a dedicated team for it — and they work together.</p>
+    </div>
+
+    <div class="divisions">
+      @for (d of divisions; track d.no) {
+        <article class="division" appReveal="scale" [revealDelay]="$index * 0.1">
+          <div class="division__bg" aria-hidden="true"></div>
+          <div class="division__head">
+            <span class="division__no">DIVISION {{ d.no }}</span>
+            <span class="icon-badge"><app-icon [name]="d.icon" /></span>
+          </div>
+          <h3 class="division__title">{{ d.title[0] }}<br />{{ d.title[1] }}</h3>
+          <p class="muted">{{ d.text }}</p>
+          <ul class="division__list">
+            @for (i of d.items; track i) { <li><app-icon name="plus" [size]="14" />{{ i }}</li> }
+          </ul>
+          <a [routerLink]="d.link" class="btn btn--ghost division__cta">{{ d.cta }} <app-icon name="arrow" [size]="18" /></a>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="section" aria-labelledby="why-title">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div>
+        <p class="eyebrow" appReveal="fade">Why TheCreateStudio?</p>
+        <h2 id="why-title" class="h2" appReveal="mask"><span class="line"><span>Built to make</span></span><span class="line"><span class="grad-text">you grow.</span></span></h2>
+      </div>
+      <p class="lead" appReveal>Creative ideas are only half the story. We pair them with strategy and solid technology so the work actually performs.</p>
+    </div>
+    <div class="grid grid-3" appReveal="stagger">
+      @for (r of reasons; track r.title; let i = $index) {
+        <article class="card why" data-reveal-item>
+          <span class="why__no">0{{ i + 1 }}</span>
+          <span class="icon-badge"><app-icon [name]="r.icon" /></span>
+          <h3 class="h4">{{ r.title }}</h3>
+          <p class="muted">{{ r.text }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section section--light process" aria-labelledby="process-title">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div>
+        <p class="eyebrow" appReveal="fade">Our working process</p>
+        <h2 id="process-title" class="h2" appReveal="mask"><span class="line"><span>From idea to growth</span></span><span class="line"><span>in five steps.</span></span></h2>
+      </div>
+      <p class="lead" appReveal>A transparent, collaborative process — you always know what's happening and what's next.</p>
+    </div>
+    <div class="process__wrap">
+    <div class="process__line" aria-hidden="true"><div class="process__progress"></div></div>
+    <ol class="process__track">
+      @for (p of process; track p.title; let i = $index) {
+        <li class="process__step">
+          <span class="process__dot" aria-hidden="true">{{ i + 1 }}</span>
+          <h3 class="h3">{{ p.title }}</h3>
+          <p>{{ p.text }}</p>
+        </li>
+      }
+    </ol>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED WORK -->
+<section class="section" aria-labelledby="work-title">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div>
+        <p class="eyebrow" appReveal="fade">Featured projects</p>
+        <h2 id="work-title" class="h2" appReveal="mask"><span class="line"><span>Selected work</span></span></h2>
+      </div>
+      <div appReveal>
+        <p class="notice">Demo projects shown for illustration. Real client work will be added here.</p>
+      </div>
+    </div>
+    <div class="featured">
+      @for (p of featured; track p.slug; let i = $index) {
+        <a class="fcard" [class.fcard--offset]="i % 2 === 1" routerLink="/work" [queryParams]="{ project: p.slug }" data-cursor="view">
+          <div class="fcard__media" appReveal="image">
+            <img [src]="p.image" [alt]="p.title + ' — demo project preview'" loading="lazy" width="800" height="600" appParallax="0.06" />
+          </div>
+          <div class="fcard__meta">
+            <div>
+              <h3 class="h3">{{ p.title }}</h3>
+              <p class="muted">{{ p.summary }}</p>
+            </div>
+            <div class="chips">
+              <span class="chip">{{ p.category }}</span>
+              @if (p.demo) { <span class="chip chip--demo">Demo</span> }
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+    <div class="center" appReveal>
+      <a routerLink="/work" class="btn btn--ghost" appMagnetic>View All Work <app-icon name="arrow" [size]="18" /></a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+@if (site.showStats) {
+  <section class="section section--alt" aria-label="Statistics">
+    <div class="container stats">
+      @for (s of site.stats; track s.label) {
+        <div class="stat" appReveal>
+          <span class="stat__num grad-text" [appCounter]="s.value" [suffix]="s.suffix">0</span>
+          <span class="muted">{{ s.label }}</span>
+        </div>
+      }
+    </div>
+  </section>
+}
+
+<!-- TESTIMONIALS -->
+<section class="section section--alt" aria-labelledby="t-title">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div>
+        <p class="eyebrow" appReveal="fade">Testimonials</p>
+        <h2 id="t-title" class="h2" appReveal="mask"><span class="line"><span>Kind words</span></span></h2>
+      </div>
+      <p class="notice" appReveal>Sample placeholders — to be replaced with genuine client feedback.</p>
+    </div>
+    <div class="grid grid-3" appReveal="stagger">
+      @for (t of testimonials; track $index) {
+        <figure class="card quote" data-reveal-item>
+          <span class="quote__mark grad-text" aria-hidden="true">“</span>
+          <blockquote>{{ t.quote }}</blockquote>
+          <figcaption>
+            <span class="quote__avatar" aria-hidden="true">{{ t.name.charAt(0) }}</span>
+            <span><strong>{{ t.name }}</strong><small class="muted">{{ t.role }}</small></span>
+            @if (t.sample) { <span class="chip chip--demo">Sample</span> }
+          </figcaption>
+        </figure>
+      }
+    </div>
+  </div>
+</section>
+
+<app-cta-section />

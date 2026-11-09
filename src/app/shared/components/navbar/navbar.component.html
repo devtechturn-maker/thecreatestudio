@@ -1,0 +1,55 @@
+<header class="nav" [class.nav--scrolled]="scrolled() || menuOpen()" [class.nav--hidden]="hidden()">
+  <nav class="nav__inner container" aria-label="Main navigation">
+    <a routerLink="/" class="nav__brand" aria-label="TheCreateStudio home"><app-brand /></a>
+
+    <ul class="nav__links">
+      <li><a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
+      <li><a routerLink="/about" routerLinkActive="is-active">About</a></li>
+      <li class="dd" #dd (mouseenter)="dropdownOpen.set(true)" (mouseleave)="dropdownOpen.set(false)"
+          (focusout)="onDropdownFocusOut($event, dd)">
+        <button type="button" class="dd__toggle" [class.is-active]="servicesActive()"
+                [attr.aria-expanded]="dropdownOpen()" aria-controls="services-menu"
+                (click)="dropdownOpen.set(!dropdownOpen())">
+          Services <app-icon name="chevron" [size]="16" />
+        </button>
+        <div id="services-menu" class="dd__menu" [class.is-open]="dropdownOpen()">
+          <a routerLink="/digital-marketing" routerLinkActive="is-active" class="dd__item">
+            <span class="dd__no">01</span>
+            <span><strong>Digital Marketing</strong><small>Social, content, SEO, GEO, ads &amp; branding</small></span>
+            <app-icon name="arrowUpRight" [size]="18" />
+          </a>
+          <a routerLink="/development" routerLinkActive="is-active" class="dd__item">
+            <span class="dd__no">02</span>
+            <span><strong>Website &amp; App Development</strong><small>Websites, web apps, mobile apps &amp; UI/UX</small></span>
+            <app-icon name="arrowUpRight" [size]="18" />
+          </a>
+        </div>
+      </li>
+      <li><a routerLink="/work" routerLinkActive="is-active">Our Work</a></li>
+      <li><a routerLink="/contact" routerLinkActive="is-active">Contact</a></li>
+    </ul>
+
+    <a routerLink="/contact" class="btn btn--primary btn--sm nav__cta" appMagnetic>LET'S CREATE <app-icon name="arrow" [size]="16" /></a>
+
+    <button #burger type="button" class="burger" [class.is-open]="menuOpen()" (click)="toggleMenu()"
+            [attr.aria-expanded]="menuOpen()" aria-controls="mobile-menu"
+            [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'">
+      <span></span><span></span>
+    </button>
+  </nav>
+
+  <div id="mobile-menu" #mobilePanel class="mobile" [class.is-open]="menuOpen()" [attr.aria-hidden]="!menuOpen()" [attr.inert]="menuOpen() ? null : ''">
+    <ul class="mobile__links container">
+      <li class="m-line"><a data-m-item routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
+      <li class="m-line"><a data-m-item routerLink="/about" routerLinkActive="is-active">About</a></li>
+      <li class="m-line"><a data-m-item routerLink="/digital-marketing" routerLinkActive="is-active">Digital Marketing</a></li>
+      <li class="m-line"><a data-m-item routerLink="/development" routerLinkActive="is-active">Website &amp; App Dev</a></li>
+      <li class="m-line"><a data-m-item routerLink="/work" routerLinkActive="is-active">Our Work</a></li>
+      <li class="m-line"><a data-m-item routerLink="/contact" routerLinkActive="is-active">Contact</a></li>
+    </ul>
+    <div class="mobile__foot container">
+      <a routerLink="/contact" class="btn btn--primary">LET'S CREATE <app-icon name="arrow" [size]="16" /></a>
+      <p class="muted">WE CREATE. YOU GROW.</p>
+    </div>
+  </div>
+</header>

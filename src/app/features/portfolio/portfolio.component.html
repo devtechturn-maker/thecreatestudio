@@ -1,0 +1,78 @@
+<section class="page-hero" aria-labelledby="work-title">
+  <div class="blob blob--purple float" style="width:460px;height:460px;top:-10%;left:40%" aria-hidden="true"></div>
+  <div class="container">
+    <p class="eyebrow" appReveal="fade">Our work</p>
+    <h1 id="work-title" class="display-l" appReveal="mask">
+      <span class="line"><span>Ideas made</span></span>
+      <span class="line"><span class="grad-text">visible.</span></span>
+    </h1>
+    <p class="lead" appReveal>A showcase across digital marketing, branding, social media creatives, websites, mobile apps and UI/UX design.</p>
+    <p class="notice demo-note" appReveal>All projects currently shown are <strong>demo concepts</strong> created to illustrate our capabilities — not real client work. Real projects will be added soon.</p>
+  </div>
+</section>
+
+<section class="section work" aria-label="Portfolio projects">
+  <div class="container">
+    <div class="filters" role="group" aria-label="Filter projects by category">
+      @for (c of categories; track c) {
+        <button type="button" [class.is-active]="filter() === c" [attr.aria-pressed]="filter() === c" (click)="setFilter(c)">
+          {{ c }} <sup>{{ count(c) }}</sup>
+        </button>
+      }
+    </div>
+    <p class="sr-only" aria-live="polite">{{ projects().length }} projects shown</p>
+
+    <ul class="grid-work" #grid>
+      @for (p of projects(); track p.slug) {
+        <li class="pcard" [class.pcard--tall]="p.size === 'tall'" [class.pcard--wide]="p.size === 'wide'">
+          <button type="button" class="pcard__btn" (click)="open(p)" data-cursor="view" [attr.aria-label]="'View project: ' + p.title">
+            <div class="pcard__media">
+              <img [src]="p.image" [alt]="p.title + ' — demo project preview'" loading="lazy" width="800" height="600" />
+              <div class="pcard__overlay" aria-hidden="true"><span class="pcard__view">View Project <app-icon name="arrowUpRight" [size]="18" /></span></div>
+            </div>
+            <div class="pcard__info">
+              <div class="chips">
+                <span class="chip">{{ p.category }}</span>
+                @if (p.demo) { <span class="chip chip--demo">Demo</span> }
+              </div>
+              <h2 class="h4">{{ p.title }}</h2>
+              <p class="muted">{{ p.summary }}</p>
+            </div>
+          </button>
+        </li>
+      } @empty {
+        <li class="empty">No projects in this category yet — check back soon.</li>
+      }
+    </ul>
+  </div>
+</section>
+
+<dialog #dialog class="modal" aria-labelledby="modal-title" (close)="selected() && close()" (click)="onBackdrop($event)">
+  @if (selected(); as p) {
+    <div class="modal__box">
+      <button type="button" class="modal__close" (click)="close()" aria-label="Close project details"><app-icon name="close" /></button>
+      <div class="modal__media"><img [src]="p.image" [alt]="p.title + ' — demo project preview'" width="800" height="600" /></div>
+      <div class="modal__body">
+        <div class="chips">
+          <span class="chip">{{ p.category }}</span>
+          @if (p.demo) { <span class="chip chip--demo">Demo project</span> }
+        </div>
+        <h2 id="modal-title" class="h2">{{ p.title }}</h2>
+        <p class="lead">{{ p.summary }}</p>
+        <p class="muted">{{ p.details }}</p>
+        <h3 class="modal__sub">Technologies &amp; tools</h3>
+        <ul class="chips">
+          @for (t of p.technologies; track t) { <li class="chip">{{ t }}</li> }
+        </ul>
+        <div class="btn-row">
+          @if (p.liveUrl) {
+            <a [href]="p.liveUrl" target="_blank" rel="noopener noreferrer" class="btn btn--ghost">Visit Live Website <app-icon name="arrowUpRight" [size]="18" /></a>
+          }
+          <a routerLink="/contact" class="btn btn--primary">Start a Similar Project <app-icon name="arrow" [size]="18" /></a>
+        </div>
+      </div>
+    </div>
+  }
+</dialog>
+
+<app-cta-section [lines]="['YOUR PROJECT', 'COULD BE', 'NEXT.']" text="Let's create work you'll be proud to show off." button="Start Your Project" />

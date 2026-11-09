@@ -1,0 +1,154 @@
+<section class="page-hero" aria-labelledby="contact-title">
+  <div class="blob blob--purple float" style="width:480px;height:480px;top:-10%;right:-8%" aria-hidden="true"></div>
+  <div class="container">
+    <p class="eyebrow" appReveal="fade">Contact us</p>
+    <h1 id="contact-title" class="display-l" appReveal="mask">
+      <span class="line"><span>Let's create</span></span>
+      <span class="line"><span class="grad-text">something great.</span></span>
+    </h1>
+    <p class="lead" appReveal>Tell us about your business and what you'd like to achieve. We'll get back to you with ideas and next steps.</p>
+  </div>
+</section>
+
+<section class="section contact" aria-label="Contact form and details">
+  <div class="container contact__grid">
+    <aside class="contact__info" appReveal>
+      <h2 class="h3">Prefer to reach out directly?</h2>
+      <ul class="info-list">
+        @if (site.contact.email) {
+          <li><app-icon name="mail" /><div><small>Email</small><a [href]="'mailto:' + site.contact.email">{{ site.contact.email }}</a></div></li>
+        }
+        @if (site.contact.phone) {
+          <li><app-icon name="phone" /><div><small>Phone</small><a [href]="'tel:' + site.contact.phone.replace(' ', '')">{{ site.contact.phone }}</a></div></li>
+        }
+        @if (wa) {
+          <li><app-icon name="whatsapp" /><div><small>WhatsApp</small><a [href]="wa" target="_blank" rel="noopener noreferrer">Chat with us</a></div></li>
+        }
+        @if (site.contact.address) {
+          <li><app-icon name="location" /><div><small>Office</small><span>{{ site.contact.address }}</span></div></li>
+        }
+        @if (!site.contact.email && !site.contact.phone && !wa) {
+          <li><app-icon name="spark" /><div><small>Inquiries</small><span>Use the form — we read every message.</span></div></li>
+        }
+      </ul>
+      <div class="info-steps">
+        <h3 class="h4">What happens next?</h3>
+        <ol>
+          <li>We review your inquiry.</li>
+          <li>We reach out via your preferred method.</li>
+          <li>We share a plan, timeline and quote.</li>
+        </ol>
+      </div>
+    </aside>
+
+    <div class="contact__form-wrap" appReveal [revealDelay]="0.1">
+      @if (!configured) {
+        <p class="notice config-note" role="note">
+          <strong>Setup required:</strong> add your Web3Forms access key in <code>src/environments/environment*.ts</code> to enable this form.
+        </p>
+      }
+
+      @if (status() === 'success') {
+        <div class="result result--ok" role="status" aria-live="polite" tabindex="-1">
+          <span class="result__icon"><app-icon name="check" [size]="32" /></span>
+          <h2 class="h3">Thank you! Your inquiry has been sent.</h2>
+          <p class="muted">We've received your project details and will get back to you soon via your preferred contact method.</p>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="reset()">Send another inquiry</button>
+        </div>
+      } @else {
+        <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate aria-describedby="form-hint">
+          <p id="form-hint" class="muted small">Fields marked <span class="req">*</span> are required.</p>
+
+          <!-- Honeypot (hidden from humans & screen readers) -->
+          <div class="hp" aria-hidden="true">
+            <label for="botcheck">Leave this field empty</label>
+            <input id="botcheck" type="checkbox" formControlName="botcheck" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="name">Full Name <span class="req">*</span></label>
+              <input id="name" class="input" formControlName="name" autocomplete="name" [class.is-invalid]="invalid('name')"
+                     [attr.aria-invalid]="invalid('name')" aria-describedby="name-err" />
+              @if (invalid('name')) { <span id="name-err" class="error-msg" role="alert">Please enter your full name.</span> }
+            </div>
+            <div class="field">
+              <label for="company">Company / Business Name</label>
+              <input id="company" class="input" formControlName="company" autocomplete="organization" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="email">Email Address <span class="req">*</span></label>
+              <input id="email" type="email" class="input" formControlName="email" autocomplete="email" [class.is-invalid]="invalid('email')"
+                     [attr.aria-invalid]="invalid('email')" aria-describedby="email-err" />
+              @if (invalid('email')) { <span id="email-err" class="error-msg" role="alert">Please enter a valid email address.</span> }
+            </div>
+            <div class="field">
+              <label for="phone">Phone Number <span class="req">*</span></label>
+              <input id="phone" type="tel" class="input" formControlName="phone" autocomplete="tel" inputmode="tel" placeholder="+91 98765 43210"
+                     [class.is-invalid]="invalid('phone')" [attr.aria-invalid]="invalid('phone')" aria-describedby="phone-err" />
+              @if (invalid('phone')) { <span id="phone-err" class="error-msg" role="alert">Enter a valid 10-digit Indian mobile number (optionally with +91).</span> }
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="service">Service Required <span class="req">*</span></label>
+              <select id="service" class="input" formControlName="service_required" [class.is-invalid]="invalid('service_required')"
+                      [attr.aria-invalid]="invalid('service_required')" aria-describedby="service-err">
+                <option value="" disabled>Select a service</option>
+                @for (s of services; track s) { <option [value]="s">{{ s }}</option> }
+              </select>
+              @if (invalid('service_required')) { <span id="service-err" class="error-msg" role="alert">Please select a service.</span> }
+            </div>
+            <div class="field">
+              <label for="budget">Project Budget <span class="req">*</span></label>
+              <select id="budget" class="input" formControlName="project_budget" [class.is-invalid]="invalid('project_budget')"
+                      [attr.aria-invalid]="invalid('project_budget')" aria-describedby="budget-err">
+                <option value="" disabled>Select a budget range</option>
+                @for (b of budgets; track b) { <option [value]="b">{{ b }}</option> }
+              </select>
+              @if (invalid('project_budget')) { <span id="budget-err" class="error-msg" role="alert">Please select a budget range.</span> }
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="message">Project Description <span class="req">*</span></label>
+            <textarea id="message" class="input" formControlName="message" rows="6" placeholder="Tell us about your business, goals and timeline…"
+                      [class.is-invalid]="invalid('message')" [attr.aria-invalid]="invalid('message')" aria-describedby="message-err"></textarea>
+            @if (invalid('message')) { <span id="message-err" class="error-msg" role="alert">Please describe your project (at least 20 characters).</span> }
+          </div>
+
+          <fieldset class="field methods">
+            <legend>Preferred Contact Method <span class="req">*</span></legend>
+            <div class="methods__opts">
+              @for (m of methods; track m) {
+                <label class="radio">
+                  <input type="radio" formControlName="preferred_contact_method" [value]="m" name="preferred_contact_method" />
+                  <span>{{ m }}</span>
+                </label>
+              }
+            </div>
+          </fieldset>
+
+          @if (status() === 'error') {
+            <div class="result result--err" role="alert">
+              <app-icon name="close" [size]="20" /> <span>{{ errorText() }}</span>
+            </div>
+          }
+
+          <button type="submit" class="btn btn--primary submit" [disabled]="status() === 'sending'" [attr.aria-busy]="status() === 'sending'">
+            @if (status() === 'sending') {
+              <span class="spinner" aria-hidden="true"></span> Sending…
+            } @else {
+              Send Inquiry <app-icon name="arrow" [size]="18" />
+            }
+          </button>
+          <p class="muted small">By submitting, you agree to our privacy policy. Your details are sent securely via Web3Forms and used only to respond to your inquiry.</p>
+        </form>
+      }
+    </div>
+  </div>
+</section>
