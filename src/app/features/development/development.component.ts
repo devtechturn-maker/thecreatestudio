@@ -148,16 +148,16 @@ const CONTACT_MAP: Record<string, string> = {
     .hero-btns { margin-top: 2rem; }
     .hero-grid { display: grid; gap: 3rem; align-items: center; }
     @media (min-width: 1100px) { .hero-grid { grid-template-columns: 1.3fr 1fr; } }
-    .code { background: #141416; border: 1px solid var(--line-strong); border-radius: 20px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,.45); }
+    .code { background: #0c2a2f; border: 1px solid var(--line-strong); border-radius: 20px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,.45); }
     .code__bar { display: flex; gap: 6px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
     .code__bar i { width: 10px; height: 10px; border-radius: 50%; background: #3f3f46; }
     .code__bar span { margin-left: 8px; font-size: .75rem; color: var(--text-2); }
     pre { margin: 0; padding: 1.5rem; font-size: clamp(.78rem, 1.4vw, .95rem); line-height: 1.8; overflow-x: auto; color: #e4e4e7; }
-    .k { color: #c084fc; } .t { color: #818cf8; } .s { color: #86efac; } .f { color: #fcd34d; }
+    .k { color: #ffe01b; } .t { color: #5eead4; } .s { color: #86efac; } .f { color: #fcd34d; }
     .tabs { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; margin-bottom: 3rem; scrollbar-width: none; }
     .tabs button { flex: none; display: inline-flex; align-items: center; gap: .55rem; padding: .9rem 1.3rem; border-radius: 999px; border: 1px solid var(--line-strong); font-family: var(--f-alt); font-weight: 700; font-size: .92rem; color: var(--text-2); transition: all .35s var(--ease); }
     .tabs button:hover { color: #fff; }
-    .tabs button.is-active { background: var(--grad); color: #fff; border-color: transparent; }
+    .tabs button.is-active { background: var(--grad); color: var(--on-accent); border-color: transparent; }
     .panel { display: grid; gap: 2.5rem; animation: in .6s var(--ease); }
     .anchor { position: absolute; margin-top: -120px; }
     .panel__head { display: grid; gap: 1.5rem; }
@@ -167,7 +167,7 @@ const CONTACT_MAP: Record<string, string> = {
     @media (min-width: 640px) { .panel__grid { grid-template-columns: 1fr 1fr; } }
     @media (min-width: 1100px) { .panel__grid { grid-template-columns: repeat(4, 1fr); } }
     .tile { display: grid; gap: 2.5rem; padding: 1.5rem; border-radius: 18px; border: 1px solid var(--line); background: var(--bg-2); position: relative; animation: in .6s var(--ease) both; transition: border-color .4s, transform .4s var(--ease), background .4s; }
-    .tile:hover { border-color: rgba(168,85,247,.5); transform: translateY(-4px); background: linear-gradient(160deg, rgba(168,85,247,.12), var(--bg-2)); }
+    .tile:hover { border-color: rgba(255,224,27,.5); transform: translateY(-4px); background: linear-gradient(160deg, rgba(255,224,27,.12), var(--bg-2)); }
     .tile app-icon { position: absolute; top: 1.4rem; right: 1.4rem; color: var(--text-2); transition: transform .4s var(--ease), color .4s; }
     .tile:hover app-icon { color: var(--purple); transform: translate(3px, -3px); }
     .tile__no { font-family: var(--f-display); color: var(--purple); font-size: .85rem; }
@@ -180,7 +180,7 @@ const CONTACT_MAP: Record<string, string> = {
     .stack__label { font-family: var(--f-display); font-size: 1.6rem; letter-spacing: -.03em; }
     .stack__items { display: flex; flex-wrap: wrap; gap: .75rem; }
     .badge { display: inline-flex; align-items: center; gap: .6rem; padding: .8rem 1.25rem; border-radius: 14px; background: var(--bg); border: 1px solid var(--line-strong); font-family: var(--f-alt); font-weight: 700; transition: all .35s var(--ease); }
-    .badge:hover { border-color: var(--purple); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(168,85,247,.2); }
+    .badge:hover { border-color: var(--purple); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,224,27,.2); }
     .badge__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--grad); }
     .proc { display: grid; gap: 2rem; }
     @media (min-width: 900px) { .proc { grid-template-columns: 1fr 1.1fr; align-items: stretch; } }
@@ -190,7 +190,7 @@ const CONTACT_MAP: Record<string, string> = {
     .proc__n { font-family: var(--f-display); font-size: .85rem; color: var(--purple); }
     .proc__t { font-family: var(--f-display); font-weight: 600; font-size: clamp(1.3rem, 2.4vw, 2rem); letter-spacing: -.03em; }
     .proc__detail { position: relative; min-height: 300px; }
-    .proc__card { height: 100%; display: grid; align-content: end; gap: 1rem; padding: 2.25rem; border-radius: var(--radius-lg); background: radial-gradient(circle at 80% 10%, rgba(168,85,247,.3), transparent 60%), var(--bg-2); border: 1px solid var(--line); animation: in .5s var(--ease); }
+    .proc__card { height: 100%; display: grid; align-content: end; gap: 1rem; padding: 2.25rem; border-radius: var(--radius-lg); background: radial-gradient(circle at 80% 10%, rgba(255,224,27,.3), transparent 60%), var(--bg-2); border: 1px solid var(--line); animation: in .5s var(--ease); }
     .proc__big { font-family: var(--f-display); font-weight: 700; font-size: clamp(4rem, 9vw, 7rem); line-height: .9; letter-spacing: -.06em; }
     .proc__bar { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 1rem; }
     .proc__bar span { display: block; height: 100%; background: var(--grad); transition: width .6s var(--ease); }

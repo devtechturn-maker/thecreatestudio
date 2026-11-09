@@ -15,7 +15,7 @@
  */
 export const environment = {
   production: true,
-  siteUrl: 'https://www.example.com', // TODO: replace with your real domain (used for canonical/OG URLs)
+  siteUrl: 'http://187.127.180.221:8091', // TODO: change to your real domain later
   web3forms: {
     endpoint: 'https://api.web3forms.com/submit',
     accessKey: 'WEB3FORMS_ACCESS_KEY',

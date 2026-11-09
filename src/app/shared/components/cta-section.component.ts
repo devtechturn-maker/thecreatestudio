@@ -30,9 +30,9 @@ import { RevealDirective } from '../directives/reveal.directive';
     .cta__inner { position: relative; z-index: 1; display: grid; justify-items: center; gap: 1.75rem; }
     .cta .lead { margin-inline: auto; }
     .cta__btn { --h: 64px; padding: 0 2.4rem; font-size: 1.05rem; }
-    .cta__glow { position: absolute; left: 50%; top: 50%; width: min(900px, 120vw); aspect-ratio: 1; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(168,85,247,.28), rgba(99,91,255,.12) 50%, transparent 70%); animation: pulse 8s ease-in-out infinite; }
-    .cta__ring { position: absolute; width: 180px; height: 180px; border-radius: 50%; border: 1px solid rgba(168,85,247,.35); left: 6%; top: 18%; }
-    .cta__ring--2 { width: 110px; height: 110px; left: auto; right: 8%; top: auto; bottom: 14%; border-color: rgba(99,91,255,.45); }
+    .cta__glow { position: absolute; left: 50%; top: 50%; width: min(900px, 120vw); aspect-ratio: 1; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(255,224,27,.28), rgba(19,128,140,.12) 50%, transparent 70%); animation: pulse 8s ease-in-out infinite; }
+    .cta__ring { position: absolute; width: 180px; height: 180px; border-radius: 50%; border: 1px solid rgba(255,224,27,.35); left: 6%; top: 18%; }
+    .cta__ring--2 { width: 110px; height: 110px; left: auto; right: 8%; top: auto; bottom: 14%; border-color: rgba(19,128,140,.45); }
     @keyframes pulse { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.12); } }
   `,
 })

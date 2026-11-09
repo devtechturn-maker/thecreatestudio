@@ -84,13 +84,13 @@ const CONTACT_MAP: Record<string, string> = {
   `,
   styles: `
     .hero-btns { margin-top: 2rem; }
-    .snav { position: sticky; top: 0; z-index: 50; background: rgba(16,16,16,.85); backdrop-filter: blur(14px); border-block: 1px solid var(--line); }
+    .snav { position: sticky; top: 0; z-index: 50; background: rgba(7,25,28,.85); backdrop-filter: blur(14px); border-block: 1px solid var(--line); }
     .snav__inner { display: flex; gap: .4rem; overflow-x: auto; padding-block: .8rem; scrollbar-width: none; }
     .snav__inner::-webkit-scrollbar { display: none; }
     .snav a { flex: none; display: inline-flex; gap: .45rem; padding: .55rem 1rem; border-radius: 999px; font-family: var(--f-alt); font-weight: 600; font-size: .85rem; color: var(--text-2); border: 1px solid transparent; transition: all .3s; }
     .snav a span { color: var(--purple); }
     .snav a:hover { color: #fff; }
-    .snav a.is-active { color: #fff; border-color: rgba(168,85,247,.5); background: rgba(168,85,247,.12); }
+    .snav a.is-active { color: #fff; border-color: rgba(255,224,27,.5); background: rgba(255,224,27,.12); }
     .svc-list { display: grid; gap: clamp(4rem, 9vw, 8rem); }
     .svc { display: grid; gap: clamp(1.5rem, 4vw, 4rem); align-items: center; scroll-margin-top: 90px; }
     @media (min-width: 900px) { .svc { grid-template-columns: 1fr 1fr; } .svc--rev .svc__visual { order: 2; } }

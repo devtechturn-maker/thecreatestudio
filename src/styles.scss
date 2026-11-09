@@ -2,18 +2,24 @@
    TheCreateStudio — Design System
    ========================================================= */
 :root {
-  --bg: #101010;
-  --bg-2: #171717;
-  --bg-3: #1f1f1f;
+  /* Brand palette — taken from the TheCreateStudio logo */
+  --yellow: #ffe01b;       /* logo yellow: primary accent */
+  --teal: #0a434b;         /* logo teal: brand surface */
+  --teal-light: #13808c;   /* lighter teal: secondary accent */
+  --on-accent: #082226;    /* text on yellow surfaces */
+
+  --bg: #07191c;
+  --bg-2: #0c2a2f;
+  --bg-3: #10363c;
   --text: #ffffff;
-  --text-2: #a1a1aa;
-  --purple: #a855f7;
-  --blue: #635bff;
+  --text-2: #a7bcbf;
+  --purple: var(--yellow); /* legacy token names kept so components stay unchanged */
+  --blue: var(--teal-light);
   --light: #f7f7f5;
   --grey: #eaeaea;
   --line: rgba(255, 255, 255, 0.1);
   --line-strong: rgba(255, 255, 255, 0.2);
-  --grad: linear-gradient(120deg, var(--purple), var(--blue));
+  --grad: linear-gradient(120deg, #ffe01b, #ffc400);
 
   --f-display: 'Space Grotesk', system-ui, sans-serif;
   --f-body: 'Inter', system-ui, sans-serif;
@@ -45,11 +51,11 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
 ul { margin: 0; padding: 0; list-style: none; }
 h1, h2, h3, h4, p, figure { margin: 0; }
-::selection { background: var(--purple); color: #fff; }
+::selection { background: var(--purple); color: var(--on-accent); }
 :focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; border-radius: 6px; }
 
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.skip-link { position: fixed; top: -100px; left: 1rem; z-index: 1000; background: var(--purple); color: #fff; padding: .75rem 1rem; border-radius: 10px; }
+.skip-link { position: fixed; top: -100px; left: 1rem; z-index: 1000; background: var(--purple); color: var(--on-accent); padding: .75rem 1rem; border-radius: 10px; }
 .skip-link:focus { top: 1rem; }
 
 /* ---------- Typography ---------- */
@@ -101,7 +107,7 @@ h1, h2, h3, h4, p, figure { margin: 0; }
 .btn:active { transform: scale(.97); }
 .btn app-icon { transition: transform .4s var(--ease); }
 .btn:hover app-icon { transform: translateX(3px) rotate(-45deg); }
-.btn--primary { background: var(--grad); color: #fff; }
+.btn--primary { background: var(--grad); color: var(--on-accent); }
 .btn--primary::before { background: #fff; }
 .btn--primary:hover { color: #111; }
 .btn--ghost { border: 1px solid var(--line-strong); color: var(--text); }
@@ -123,21 +129,21 @@ h1, h2, h3, h4, p, figure { margin: 0; }
   padding: clamp(1.5rem, 3vw, 2.25rem); overflow: hidden;
   transition: border-color .5s var(--ease), transform .5s var(--ease), background .5s;
 }
-.card:hover { border-color: rgba(168, 85, 247, .45); transform: translateY(-4px); }
+.card:hover { border-color: rgba(255,224,27, .45); transform: translateY(-4px); }
 .chip {
   display: inline-flex; align-items: center; gap: .4rem; padding: .4rem .85rem; border-radius: 999px;
   border: 1px solid var(--line-strong); font-size: .8rem; font-family: var(--f-alt); font-weight: 600; color: var(--text-2);
 }
-.chip--demo { border-color: rgba(250, 204, 21, .45); color: #fde047; background: rgba(250, 204, 21, .08); }
+.chip--demo { border-color: rgba(251,146,60, .45); color: #fdba74; background: rgba(251,146,60, .08); }
 .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
 .icon-badge {
   width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
-  background: linear-gradient(135deg, rgba(168,85,247,.18), rgba(99,91,255,.18)); color: #d8b4fe;
-  border: 1px solid rgba(168,85,247,.3); transition: transform .6s var(--ease);
+  background: linear-gradient(135deg, rgba(255,224,27,.18), rgba(19,128,140,.18)); color: #ffe01b;
+  border: 1px solid rgba(255,224,27,.3); transition: transform .6s var(--ease);
 }
 .card:hover .icon-badge, .icon-badge:hover { transform: rotate(-8deg) scale(1.08); }
 .notice {
-  border: 1px dashed rgba(250, 204, 21, .45); background: rgba(250, 204, 21, .06); color: #fde68a;
+  border: 1px dashed rgba(251,146,60, .45); background: rgba(251,146,60, .06); color: #fed7aa;
   border-radius: 14px; padding: .85rem 1.1rem; font-size: .88rem;
 }
 .divider { height: 1px; background: var(--line); border: 0; margin: 0; }
@@ -145,7 +151,7 @@ h1, h2, h3, h4, p, figure { margin: 0; }
 /* ---------- Floating blobs ---------- */
 .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .35; pointer-events: none; z-index: 0; }
 .blob--purple { background: var(--purple); }
-.blob--blue { background: var(--blue); }
+.blob--blue { background: var(--teal-light); }
 @keyframes float { 0%,100% { transform: translate3d(0,0,0) } 50% { transform: translate3d(0,-18px,0) } }
 .float { animation: float 7s ease-in-out infinite; }
 .float--slow { animation-duration: 10s; }
@@ -170,7 +176,7 @@ h1, h2, h3, h4, p, figure { margin: 0; }
   border-radius: 14px; padding: .95rem 1.1rem; font: inherit; font-size: 1rem;
   transition: border-color .3s, box-shadow .3s;
 }
-.input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 4px rgba(168,85,247,.18); }
+.input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 4px rgba(255,224,27,.18); }
 .input.is-invalid { border-color: #f87171; }
 select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23a1a1aa' stroke-width='2'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.75rem; }
 select.input option { background: var(--bg-2); }
@@ -182,7 +188,7 @@ textarea.input { min-height: 160px; resize: vertical; }
 .prose h2 { font-size: 1.6rem; margin: 2.5rem 0 1rem; color: #fff; }
 .prose p, .prose li { margin-bottom: 1rem; }
 .prose ul { list-style: disc; padding-left: 1.25rem; }
-.prose a { color: #d8b4fe; text-decoration: underline; }
+.prose a { color: #ffe01b; text-decoration: underline; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {

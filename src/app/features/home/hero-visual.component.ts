@@ -41,7 +41,7 @@ import { MotionService } from '../../core/services/motion.service';
 
     <div class="chart layer" data-depth="0.6">
       <p>Growth</p>
-      <svg viewBox="0 0 160 70"><defs><linearGradient id="hv-g" x1="0" x2="1"><stop offset="0" stop-color="#a855f7"/><stop offset="1" stop-color="#635bff"/></linearGradient></defs>
+      <svg viewBox="0 0 160 70"><defs><linearGradient id="hv-g" x1="0" x2="1"><stop offset="0" stop-color="#ffe01b"/><stop offset="1" stop-color="#13808c"/></linearGradient></defs>
         <path d="M0 62 C30 58 40 44 62 46 S100 22 120 24 S150 6 160 4" fill="none" stroke="url(#hv-g)" stroke-width="3" stroke-linecap="round"/></svg>
     </div>
 
@@ -54,14 +54,14 @@ import { MotionService } from '../../core/services/motion.service';
     :host { display: block; }
     .stage { position: relative; width: 100%; max-width: 600px; margin-inline: auto; aspect-ratio: 1 / .92; }
     .layer { position: absolute; will-change: transform; }
-    .orb { position: absolute; inset: 14%; border-radius: 50%; background: conic-gradient(from 120deg, #a855f7, #635bff, #101010 60%, #a855f7); filter: blur(50px); opacity: .45; animation: spin 18s linear infinite; }
+    .orb { position: absolute; inset: 14%; border-radius: 50%; background: conic-gradient(from 120deg, #ffe01b, #13808c, #07191c 60%, #ffe01b); filter: blur(50px); opacity: .45; animation: spin 18s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .browser { left: 0; top: 10%; width: 74%; border-radius: 16px; background: #1b1b1f; border: 1px solid var(--line-strong); box-shadow: 0 40px 80px rgba(0,0,0,.5); overflow: hidden; }
+    .browser { left: 0; top: 10%; width: 74%; border-radius: 16px; background: #0f3036; border: 1px solid var(--line-strong); box-shadow: 0 40px 80px rgba(0,0,0,.5); overflow: hidden; }
     .browser__bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
     .browser__bar i { width: 9px; height: 9px; border-radius: 50%; background: #3f3f46; }
     .browser__bar span { margin-left: 10px; font-size: 10px; color: var(--text-2); background: rgba(255,255,255,.05); padding: 3px 10px; border-radius: 99px; }
     .browser__body { padding: 18px; display: grid; gap: 14px; }
-    .b-hero { height: 110px; border-radius: 12px; padding: 16px; background: linear-gradient(120deg, rgba(168,85,247,.35), rgba(99,91,255,.25)); display: grid; gap: 8px; align-content: center; }
+    .b-hero { height: 110px; border-radius: 12px; padding: 16px; background: linear-gradient(120deg, rgba(255,224,27,.35), rgba(19,128,140,.25)); display: grid; gap: 8px; align-content: center; }
     .b-hero b { display: block; height: 12px; width: 70%; border-radius: 6px; background: rgba(255,255,255,.85); }
     .b-hero b.s { width: 45%; background: rgba(255,255,255,.45); }
     .b-hero em { display: block; width: 70px; height: 20px; border-radius: 99px; background: #fff; margin-top: 6px; }
@@ -69,7 +69,7 @@ import { MotionService } from '../../core/services/motion.service';
     .b-cards span { height: 64px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
     .phone { right: 2%; top: 22%; width: 31%; aspect-ratio: 9/18.5; border-radius: 28px; background: #0c0c0e; border: 1px solid var(--line-strong); padding: 8px; box-shadow: 0 40px 70px rgba(0,0,0,.6); }
     .phone__notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 34%; height: 12px; border-radius: 99px; background: #000; z-index: 1; }
-    .phone__screen { height: 100%; border-radius: 22px; background: #18181b; padding: 30px 10px 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+    .phone__screen { height: 100%; border-radius: 22px; background: #0f3036; padding: 30px 10px 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
     .p-head { height: 10px; width: 60%; border-radius: 5px; background: rgba(255,255,255,.7); }
     .p-card { height: 34%; border-radius: 14px; background: var(--grad); position: relative; }
     .p-card span { position: absolute; left: 10px; bottom: 10px; width: 50%; height: 8px; border-radius: 4px; background: rgba(255,255,255,.8); }
@@ -79,7 +79,7 @@ import { MotionService } from '../../core/services/motion.service';
     .post__head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .post__av { width: 22px; height: 22px; border-radius: 50%; background: var(--grad); }
     .post__name { width: 50%; height: 8px; border-radius: 4px; background: #d4d4d8; }
-    .post__img { aspect-ratio: 1; border-radius: 12px; background: linear-gradient(135deg, #a855f7, #635bff 60%, #101010); display: grid; place-items: center; color: #fff; }
+    .post__img { aspect-ratio: 1; border-radius: 12px; background: linear-gradient(135deg, #ffe01b, #13808c 60%, #07191c); display: grid; place-items: center; color: #fff; }
     .post__foot { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-top: 8px; font-family: var(--f-alt); }
     .post__foot .up { color: #16a34a; }
     .chart { right: 0; bottom: 6%; width: 36%; border-radius: 16px; padding: 12px 14px; background: rgba(23,23,23,.85); backdrop-filter: blur(10px); border: 1px solid var(--line-strong); }

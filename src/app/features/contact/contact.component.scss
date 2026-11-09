@@ -22,13 +22,13 @@ legend { font-family: var(--f-alt); font-weight: 600; font-size: .9rem; margin-b
 .radio { position: relative; cursor: pointer; }
 .radio input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
 .radio span { display: inline-block; padding: .7rem 1.2rem; border-radius: 999px; border: 1px solid var(--line-strong); font-family: var(--f-alt); font-weight: 600; font-size: .9rem; transition: all .3s; }
-.radio input:checked + span { background: var(--grad); border-color: transparent; color: #fff; }
+.radio input:checked + span { background: var(--grad); border-color: transparent; color: var(--on-accent); }
 .radio input:focus-visible + span { outline: 2px solid var(--purple); outline-offset: 3px; }
 .submit { justify-self: start; min-width: 200px; }
-.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; animation: spin .7s linear infinite; }
+.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(8,34,38,.3); border-top-color: var(--on-accent); animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .result { border-radius: 16px; }
 .result--err { display: flex; gap: .75rem; align-items: flex-start; padding: 1rem 1.2rem; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.4); color: #fecaca; }
 .result--ok { display: grid; gap: 1rem; justify-items: start; padding: 1rem 0; animation: pop .6s var(--ease); }
-.result__icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--grad); }
+.result__icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--grad); color: var(--on-accent); }
 @keyframes pop { from { opacity: 0; transform: translateY(20px); } }

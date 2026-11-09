@@ -12,8 +12,8 @@ import { MotionService } from '../../core/services/motion.service';
     .dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #fff; mix-blend-mode: difference; }
     .ring { width: 40px; height: 40px; margin: -20px 0 0 -20px; border: 1px solid rgba(255,255,255,.5); display: grid; place-items: center; transition: width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease), background .35s, border-color .35s; }
     .ring span { font-family: var(--f-alt); font-weight: 700; font-size: .75rem; opacity: 0; transition: opacity .3s; }
-    :host-context(.cursor-hover) .ring { width: 64px; height: 64px; margin: -32px 0 0 -32px; border-color: var(--purple); background: rgba(168,85,247,.12); }
-    :host-context(.cursor-view) .ring { width: 92px; height: 92px; margin: -46px 0 0 -46px; background: var(--purple); border-color: transparent; }
+    :host-context(.cursor-hover) .ring { width: 64px; height: 64px; margin: -32px 0 0 -32px; border-color: var(--purple); background: rgba(255,224,27,.12); }
+    :host-context(.cursor-view) .ring { width: 92px; height: 92px; margin: -46px 0 0 -46px; background: var(--purple); color: var(--on-accent); border-color: transparent; }
     :host-context(.cursor-view) .ring span { opacity: 1; }
   `,
 })

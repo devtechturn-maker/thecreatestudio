@@ -86,7 +86,7 @@ import { SITE, whatsappLink } from '../../core/config/site.config';
     .footer__contact a, .footer__contact span { display: inline-flex; gap: .6rem; align-items: flex-start; font-size: .94rem; color: #e4e4e7; word-break: break-word; }
     .footer__social { display: flex; gap: .6rem; margin-top: 1.5rem; }
     .footer__social a { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; transition: all .4s var(--ease); }
-    .footer__social a:hover { background: var(--grad); border-color: transparent; color: #fff; transform: translateY(-3px); }
+    .footer__social a:hover { background: var(--grad); border-color: transparent; color: var(--on-accent); transform: translateY(-3px); }
     .footer__big { font-family: var(--f-display); font-weight: 700; letter-spacing: -.05em; font-size: clamp(2.6rem, 10.5vw, 10rem); line-height: .9; margin: clamp(3rem, 7vw, 6rem) 0 1.5rem; white-space: nowrap; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding: 1.5rem 0 2rem; border-top: 1px solid var(--line); color: var(--text-2); font-size: .85rem; }
     .footer__bottom a { color: var(--text-2); font-size: .85rem; }
