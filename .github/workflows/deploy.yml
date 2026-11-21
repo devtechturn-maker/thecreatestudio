@@ -36,8 +36,34 @@ jobs:
             if [ -f /root/.web3forms_key ]; then
               sed -i "s/WEB3FORMS_ACCESS_KEY/$(cat /root/.web3forms_key)/" src/environments/environment.ts
             fi
+
+            # ---- Backend (Spring Boot) — only once the server is set up for it
+            #      (Java installed and the systemd service file present). Built and
+            #      tested BEFORE anything live is replaced.
+            BACKEND=0
+            if command -v java >/dev/null 2>&1 && [ -f /etc/systemd/system/thecreatestudio-backend.service ]; then
+              BACKEND=1
+              (cd backend && chmod +x mvnw && ./mvnw -q -B package)
+            else
+              echo "Backend not set up on this server yet — skipping backend deploy."
+            fi
+
+            # ---- Frontend (Angular)
             npm install --no-audit --no-fund
             npm run build
+
+            # ---- Go live (only reached if every build above succeeded)
+            if [ "$BACKEND" = "1" ]; then
+              cp backend/target/backend-*.jar /opt/thecreatestudio-backend/app.jar
+              chown tcs:tcs /opt/thecreatestudio-backend/app.jar
+              systemctl restart thecreatestudio-backend
+              for i in $(seq 1 60); do
+                curl -fs http://127.0.0.1:8080/actuator/health >/dev/null && break
+                sleep 2
+              done
+              curl -fs http://127.0.0.1:8080/actuator/health >/dev/null || { echo "Backend failed to start"; journalctl -u thecreatestudio-backend -n 50 --no-pager; exit 1; }
+              echo "Backend healthy."
+            fi
             rm -rf /var/www/thecreatestudio/*
             cp -r dist/TheCreateStudio/browser/* /var/www/thecreatestudio/
             chown -R www-data:www-data /var/www/thecreatestudio

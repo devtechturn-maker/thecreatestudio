@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
+import { MainLayoutComponent } from './layouts/main-layout.component';
+import { adminGuard } from './core/api/admin.guard';
 
-export const routes: Routes = [
+const siteRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./features/home/home.component').then((m) => m.HomeComponent),
@@ -81,5 +83,60 @@ export const routes: Routes = [
     path: '**',
     loadComponent: () => import('./features/not-found/not-found.component').then((m) => m.NotFoundComponent),
     data: { seo: { title: 'Page Not Found', description: 'The page you are looking for does not exist.', noindex: true } },
+  },
+];
+
+const noindex = (title: string) => ({ seo: { title, description: 'TheCreateStudio', noindex: true } });
+
+export const routes: Routes = [
+  // Admin area — own layout, guarded by JWT login, never indexed.
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin-layout.component').then((m) => m.AdminLayoutComponent),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'proposals' },
+      {
+        path: 'login',
+        loadComponent: () => import('./features/admin/admin-login.component').then((m) => m.AdminLoginComponent),
+        data: noindex('Admin Login'),
+      },
+      {
+        path: 'proposals',
+        canActivate: [adminGuard],
+        data: noindex('Proposals'),
+        loadComponent: () => import('./features/admin/proposal-list.component').then((m) => m.ProposalListComponent),
+      },
+      {
+        path: 'proposals/new',
+        canActivate: [adminGuard],
+        data: noindex('New Proposal'),
+        loadComponent: () => import('./features/admin/proposal-editor.component').then((m) => m.ProposalEditorComponent),
+      },
+      {
+        path: 'proposals/:id/edit',
+        canActivate: [adminGuard],
+        data: noindex('Edit Proposal'),
+        loadComponent: () => import('./features/admin/proposal-editor.component').then((m) => m.ProposalEditorComponent),
+      },
+      {
+        path: 'proposals/:id',
+        canActivate: [adminGuard],
+        data: noindex('Proposal'),
+        loadComponent: () => import('./features/admin/proposal-detail.component').then((m) => m.ProposalDetailComponent),
+      },
+    ],
+  },
+  // Public website (marketing layout) + client signing page.
+  {
+    path: '',
+    component: MainLayoutComponent,
+    children: [
+      {
+        path: 'sign/:token',
+        loadComponent: () => import('./features/sign/sign.component').then((m) => m.SignComponent),
+        data: noindex('Review & Sign Proposal'),
+      },
+      ...siteRoutes,
+    ],
   },
 ];

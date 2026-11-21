@@ -1,17 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { MainLayoutComponent } from './layouts/main-layout.component';
 import { LoaderComponent } from './shared/components/loader.component';
 import { CursorComponent } from './shared/components/cursor.component';
 import { SeoData, SeoService } from './core/services/seo.service';
 
 @Component({
   selector: 'app-root',
-  imports: [MainLayoutComponent, LoaderComponent, CursorComponent],
+  imports: [RouterOutlet, LoaderComponent, CursorComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<app-loader /><app-cursor /><app-main-layout />`,
+  template: `<app-loader /><app-cursor /><router-outlet />`,
 })
 export class App {
   private readonly router = inject(Router);

@@ -1,0 +1,17 @@
+# Copy to application-local.yml (gitignored) and fill in. Run with SPRING_PROFILES_ACTIVE=local
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/the_create_studio
+    username: tcs_app
+    password: change-me
+app:
+  public-base-url: http://localhost:4200
+  jwt:
+    secret: generate-with-openssl-rand-base64-48
+  admin:
+    email: you@example.com
+    password: a-strong-password
+  # razorpay:
+  #   key-id: rzp_test_xxxxx
+  #   key-secret: xxxxx
+  #   webhook-secret: xxxxx

@@ -1,0 +1,28 @@
+# systemd unit for the TheCreateStudio Spring Boot backend.
+# Install: cp deploy/thecreatestudio-backend.service /etc/systemd/system/
+#          systemctl daemon-reload && systemctl enable --now thecreatestudio-backend
+
+[Unit]
+Description=TheCreateStudio backend (Spring Boot)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=tcs
+Group=tcs
+WorkingDirectory=/opt/thecreatestudio-backend
+# Secrets live here (chmod 600, owned by root) — see deploy/backend.env.example
+EnvironmentFile=/etc/thecreatestudio/backend.env
+ExecStart=/usr/bin/java -Xms128m -Xmx384m -jar /opt/thecreatestudio-backend/app.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

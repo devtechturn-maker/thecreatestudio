@@ -1,0 +1,105 @@
+@if (p(); as p) {
+  <div class="adm-head">
+    <div>
+      <p class="eyebrow">{{ p.number }}</p>
+      <h1 class="h2">{{ p.title }}</h1>
+      <app-status-badge [status]="p.status" [expired]="p.expired" />
+    </div>
+    <div class="head-actions">
+      <button type="button" class="btn btn--ghost btn--sm" (click)="downloadPdf()">{{ p.signedPdfHash ? 'Signed PDF' : 'Preview PDF' }}</button>
+      @if (isDraft()) { <a [routerLink]="['/admin/proposals', p.id, 'edit']" class="btn btn--ghost btn--sm">Edit</a> }
+    </div>
+  </div>
+
+  @if (notice()) { <p class="adm-note" role="status">{{ notice() }}</p> }
+  @if (error()) { <p class="adm-alert" role="alert">{{ error() }}</p> }
+
+  <div class="layout">
+    <div class="main">
+      <!-- Step panel -->
+      @if (isDraft()) {
+        <section class="adm-card step">
+          @if (!p.ownerSignature) {
+            <h2 class="h4">Step 1 · Sign as TheCreateStudio</h2>
+            <p class="muted">Review the content, then sign. Your signature fixes the content fingerprint.</p>
+            <div class="field"><label for="signer">Signing as</label>
+              <input id="signer" class="input" [ngModel]="signerName()" (ngModelChange)="signerName.set($event)" maxlength="120" /></div>
+            <app-signature-pad (changed)="signature.set($event)" />
+            <button type="button" class="btn btn--primary btn--sm" (click)="sign()" [disabled]="busy() || !signature()">Sign proposal</button>
+          } @else {
+            <h2 class="h4">Step 2 · Send to client</h2>
+            <p class="muted">Signed by {{ p.ownerSignerName }} on {{ p.ownerSignedAt | date: 'd MMM y, h:mm a' }}. Sending locks the content and emails {{ p.clientEmail }} a private signing link.</p>
+            <button type="button" class="btn btn--primary btn--sm" (click)="send()" [disabled]="busy()">Send to client</button>
+          }
+        </section>
+      }
+
+      @if (p.signingUrl && p.status !== 'CANCELLED') {
+        <app-share-panel [proposal]="p" [emailConfigured]="emailConfigured()" (updated)="this.p.set($event)" />
+      }
+
+      @if (p.status === 'SIGNED') {
+        <section class="adm-card step">
+          <h2 class="h4">Payment</h2>
+          @if (p.advancePaise > 0) {
+            <p class="muted">Advance of {{ inr(p.advancePaise) }} is due. The client can pay via Razorpay from the signing link. If they paid another way, record it here:</p>
+          } @else {
+            <p class="muted">No online advance was set. Record payment when received:</p>
+          }
+          <div class="link-row">
+            <input class="input" placeholder="Note, e.g. NEFT ref 12345" [ngModel]="paidNote()" (ngModelChange)="paidNote.set($event)" maxlength="300" />
+            <button type="button" class="btn btn--ghost btn--sm" (click)="markPaid()" [disabled]="busy()">Mark as paid</button>
+          </div>
+        </section>
+      }
+
+      <!-- Document -->
+      <article class="adm-card doc">
+        <dl class="meta">
+          <div><dt>Client</dt><dd>{{ p.clientName }}@if (p.clientCompany) {, {{ p.clientCompany }}}<br />{{ p.clientEmail }}@if (p.clientPhone) { · {{ p.clientPhone }} }</dd></div>
+          <div><dt>Total</dt><dd>{{ inr(p.amountPaise) }}@if (p.advancePaise > 0) {<br /><small class="muted">Advance {{ inr(p.advancePaise) }}</small>}</dd></div>
+          <div><dt>Valid until</dt><dd>{{ p.validUntil ? (p.validUntil | date: 'd MMM y') : '—' }}</dd></div>
+        </dl>
+        <h3>Overview</h3>@for (l of lines(p.summary); track $index) { <p>{{ l }}</p> }
+        <h3>Scope</h3>@for (l of lines(p.scope); track $index) { <p>{{ l }}</p> }
+        <h3>Terms</h3><div class="terms">@for (l of lines(p.terms); track $index) { <p>{{ l }}</p> }</div>
+        <h3>Signatures</h3>
+        <div class="sigs">
+          <div class="sig"><small>TheCreateStudio</small>
+            @if (p.ownerSignature) { <img [src]="p.ownerSignature" alt="Your signature" /><strong>{{ p.ownerSignerName }}</strong><small>{{ p.ownerSignedAt | date: 'd MMM y, h:mm a' }}</small> } @else { <em class="muted">Not signed</em> }
+          </div>
+          <div class="sig"><small>Client</small>
+            @if (p.clientSignature) { <img [src]="p.clientSignature" alt="Client signature" /><strong>{{ p.clientSignerName }}</strong><small>{{ p.clientSignedAt | date: 'd MMM y, h:mm a' }} · IP {{ p.clientSignedIp }}</small> } @else { <em class="muted">Awaiting client</em> }
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <aside class="side">
+      <section class="adm-card">
+        <h2 class="h4">Activity</h2>
+        <ol class="timeline">
+          @for (e of p.events; track $index) {
+            <li><strong>{{ eventLabel(e.type) }}</strong><small class="muted">{{ e.createdAt | date: 'd MMM y, h:mm a' }} · {{ e.actor | lowercase }}@if (e.ip) { · {{ e.ip }} }</small>
+              @if (e.detail) { <span class="muted small">{{ e.detail }}</span> }</li>
+          }
+        </ol>
+      </section>
+      @if (p.contentHash) {
+        <section class="adm-card small">
+          <h2 class="h4">Integrity</h2>
+          <p class="muted">Content fingerprint</p><code>{{ p.contentHash }}</code>
+          @if (p.signedPdfHash) { <p class="muted">Signed PDF SHA-256</p><code>{{ p.signedPdfHash }}</code> }
+        </section>
+      }
+      @if (canCancel()) {
+        <button type="button" class="danger" (click)="cancel()" [disabled]="busy()">Cancel proposal</button>
+      }
+    </aside>
+  </div>
+} @else if (error()) {
+  <p class="adm-alert" role="alert">{{ error() }}</p>
+  <a routerLink="/admin/proposals" class="btn btn--ghost btn--sm">Back to proposals</a>
+} @else {
+  <p class="muted" role="status">Loading…</p>
+}

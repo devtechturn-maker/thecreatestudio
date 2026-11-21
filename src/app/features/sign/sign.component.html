@@ -1,0 +1,123 @@
+<section class="sign">
+  <div class="container sign__inner">
+    @if (loading()) {
+      <p class="state" role="status">Loading your proposal…</p>
+    } @else if (loadError()) {
+      <div class="state">
+        <h1 class="h2">Link not available</h1>
+        <p class="lead">{{ loadError() }}</p>
+        <a routerLink="/contact" class="btn btn--primary">Contact Us <app-icon name="arrow" [size]="18" /></a>
+      </div>
+    } @else if (p(); as p) {
+      <!-- Status banners -->
+      @if (p.status === 'SIGNED' || p.status === 'PAID') {
+        <div class="banner banner--ok" role="status">
+          <app-icon name="check" [size]="22" />
+          <div>
+            <strong>{{ p.status === 'PAID' ? 'Signed and paid. Thank you!' : 'Signed by both parties. Thank you!' }}</strong>
+            <span>Signed by {{ p.clientSignerName }} on {{ p.clientSignedAt | date: 'd MMM y, h:mm a' }}. Download your copy below.</span>
+          </div>
+        </div>
+      } @else if (p.expired) {
+        <div class="banner banner--warn" role="alert">This proposal expired on {{ p.validUntil | date: 'd MMM y' }}. Please contact us for an updated proposal.</div>
+      }
+
+      <header class="doc-head">
+        <p class="eyebrow">Proposal {{ p.number }}</p>
+        <h1 class="h2">{{ p.title }}</h1>
+        <p class="muted">Prepared for <strong>{{ p.clientName }}</strong>@if (p.clientCompany) {, {{ p.clientCompany }}}
+          @if (p.validUntil) { · Valid until {{ p.validUntil | date: 'd MMM y' }} }</p>
+        <a class="btn btn--ghost btn--sm" [href]="pdfUrl()" download>
+          {{ p.status === 'SIGNED' || p.status === 'PAID' ? 'Download signed PDF' : 'Download PDF' }} <app-icon name="arrowUp" [size]="16" class="rot" />
+        </a>
+      </header>
+
+      <article class="doc">
+        <h2>Overview</h2>
+        @for (line of paragraphs(p.summary); track $index) { <p>{{ line }}</p> }
+
+        <h2>Scope of work &amp; deliverables</h2>
+        @for (line of paragraphs(p.scope); track $index) { <p>{{ line }}</p> }
+
+        <h2>Investment</h2>
+        <table class="money">
+          <tr><th scope="row">Total project fee</th><td>{{ inr(p.amountPaise) }}</td></tr>
+          @if (p.advancePaise > 0) {
+            <tr><th scope="row">Advance payable on acceptance</th><td>{{ inr(p.advancePaise) }}</td></tr>
+            <tr><th scope="row">Balance</th><td>{{ inr(p.amountPaise - p.advancePaise) }}</td></tr>
+          }
+        </table>
+
+        <h2>Terms &amp; conditions</h2>
+        <div class="terms" tabindex="0" aria-label="Terms and conditions">
+          @for (line of paragraphs(p.terms); track $index) { <p>{{ line }}</p> }
+        </div>
+
+        <h2>Signatures</h2>
+        <div class="sigs">
+          <div class="sig">
+            <span class="sig__role">For TheCreateStudio</span>
+            @if (p.ownerSignature) { <img [src]="p.ownerSignature" alt="Signature of {{ p.ownerSignerName }}" /> }
+            <strong>{{ p.ownerSignerName }}</strong>
+            <small>Signed {{ p.ownerSignedAt | date: 'd MMM y, h:mm a' }}</small>
+          </div>
+          <div class="sig">
+            <span class="sig__role">Client</span>
+            @if (p.clientSignature) {
+              <img [src]="p.clientSignature" alt="Signature of {{ p.clientSignerName }}" />
+              <strong>{{ p.clientSignerName }}</strong>
+              <small>Signed {{ p.clientSignedAt | date: 'd MMM y, h:mm a' }}</small>
+            } @else {
+              <span class="sig__empty">Awaiting your signature</span>
+            }
+          </div>
+        </div>
+      </article>
+
+      <!-- Accept & sign -->
+      @if (canSign()) {
+        <section class="panel" aria-labelledby="accept-title">
+          <h2 id="accept-title" class="h3">Accept &amp; sign</h2>
+          <form (ngSubmit)="submit()" class="form">
+            <div class="field">
+              <label for="signer">Your full name <span class="req">*</span></label>
+              <input id="signer" class="input input--light" name="signer" autocomplete="name" [ngModel]="signerName()" (ngModelChange)="signerName.set($event)" maxlength="120" required />
+            </div>
+            <div class="field">
+              <span class="label">Your signature <span class="req">*</span></span>
+              <app-signature-pad (changed)="signature.set($event)" />
+            </div>
+            <label class="check">
+              <input type="checkbox" name="accept" [ngModel]="accept()" (ngModelChange)="accept.set($event)" />
+              <span>I have read and accept the scope, investment and terms &amp; conditions of proposal {{ p.number }}, and I agree that my electronic signature is legally binding.</span>
+            </label>
+            @if (error()) { <p class="alert" role="alert">{{ error() }}</p> }
+            <button type="submit" class="btn btn--primary" [disabled]="!ready()" [attr.aria-busy]="submitting()">
+              @if (submitting()) { <span class="spinner" aria-hidden="true"></span> Signing… } @else { Accept &amp; Sign <app-icon name="check" [size]="18" /> }
+            </button>
+            <p class="muted small">Your name, signature, IP address and the time of signing are recorded to create a secure audit trail.</p>
+          </form>
+        </section>
+      }
+
+      <!-- Payment -->
+      @if (p.paymentDue) {
+        <section class="panel panel--pay" aria-labelledby="pay-title">
+          <h2 id="pay-title" class="h3">Pay advance: {{ inr(p.advancePaise) }}</h2>
+          @if (paymentsEnabled()) {
+            <p class="muted">Pay securely via Razorpay (UPI, cards, net banking, wallets).</p>
+            @if (payError()) { <p class="alert" role="alert">{{ payError() }}</p> }
+            <button type="button" class="btn btn--primary" (click)="pay()" [disabled]="paying()">
+              @if (paying()) { <span class="spinner" aria-hidden="true"></span> Processing… } @else { Pay {{ inr(p.advancePaise) }} }
+            </button>
+          } @else {
+            <p class="muted">Online payment isn't available yet. We'll share payment details with you directly.</p>
+          }
+        </section>
+      }
+      @if (justPaid()) {
+        <div class="banner banner--ok" role="status"><app-icon name="check" [size]="22" /><div><strong>Payment received. Thank you!</strong></div></div>
+      }
+    }
+  </div>
+</section>

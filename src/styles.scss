@@ -195,3 +195,20 @@ textarea.input { min-height: 160px; resize: vertical; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* ---------- Admin area ---------- */
+.adm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.adm-head .eyebrow { margin-bottom: .4rem; }
+.adm-head .h2 { margin-bottom: .6rem; font-size: clamp(1.6rem, 3vw, 2.4rem); }
+.adm-card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.1rem, 2.5vw, 1.75rem); }
+.adm-alert { color: #fecaca; background: rgba(248, 113, 113, .1); border: 1px solid rgba(248, 113, 113, .4); padding: .8rem 1rem; border-radius: 12px; margin-bottom: 1rem; }
+.adm-note { color: #fde68a; background: rgba(255, 224, 27, .07); border: 1px solid rgba(255, 224, 27, .3); padding: .8rem 1rem; border-radius: 12px; margin-bottom: 1rem; }
+.adm-table-wrap { padding: 0; overflow-x: auto; }
+.adm-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.adm-table th { text-align: left; font-family: var(--f-alt); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); padding: .9rem 1rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.adm-table td { padding: .9rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.adm-table tr:last-child td { border-bottom: 0; }
+.adm-table tbody tr:hover { background: rgba(255, 255, 255, .02); }
+.adm-table .num { text-align: right; white-space: nowrap; }
+.adm-table a:hover { color: var(--yellow); }
+.adm-table .strong { font-weight: 700; color: var(--yellow); }
