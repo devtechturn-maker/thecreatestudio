@@ -32,10 +32,6 @@ class AdminSeeder implements ApplicationRunner {
             log.warn("No admin account exists. Set ADMIN_EMAIL and ADMIN_PASSWORD and restart to create one.");
             return;
         }
-        if (admin.password().length() < 10) {
-            log.warn("ADMIN_PASSWORD must be at least 10 characters — admin account not created.");
-            return;
-        }
         repo.save(new AdminUser(admin.email(), encoder.encode(admin.password()), props.ownerSignerName()));
         log.info("Created initial admin account for {}", admin.email());
     }
