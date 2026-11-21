@@ -36,6 +36,7 @@ import { AuthService } from '../../core/api/auth.service';
     nav > a.is-active, nav > a:not(.btn):hover { color: #fff; }
     .bar__user { display: flex; align-items: center; gap: .9rem; font-size: .85rem; }
     .link { color: var(--yellow); font-weight: 700; font-family: var(--f-alt); }
+    @media (max-width: 700px) { .bar { position: static; } .bar__inner { gap: .9rem; } nav { margin-left: 0; width: 100%; justify-content: space-between; } }
     .adm { max-width: 1240px; margin: auto; padding: 2rem var(--gutter) 5rem; outline: none; }
   `,
 })

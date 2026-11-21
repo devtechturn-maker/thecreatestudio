@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AdminProposalsApi } from '../../core/api/proposals.api';
-import { ProposalContent, apiError } from '../../core/api/api.models';
+import { ProposalContent, apiError, formatINR } from '../../core/api/api.models';
 
 /** Default terms — a starting point only. Review with a legal professional. */
 const DEFAULT_TERMS = `1. Scope: Work is limited to the deliverables listed in this proposal. Additional work will be quoted separately.
@@ -51,10 +52,32 @@ const DEFAULT_TERMS = `1. Scope: Work is limited to the deliverables listed in t
       <fieldset>
         <legend>Investment</legend>
         <div class="row row--3">
-          <div class="field"><label for="amount">Total fee (₹) *</label><input id="amount" type="number" min="0" step="0.01" class="input" formControlName="amount" /></div>
-          <div class="field"><label for="advance">Advance via Razorpay (₹)</label><input id="advance" type="number" min="0" step="0.01" class="input" formControlName="advance" /><small class="muted">0 = no online payment</small></div>
-          <div class="field"><label for="validUntil">Valid until</label><input id="validUntil" type="date" class="input" formControlName="validUntil" /></div>
+          <div class="field">
+            <label for="amount">Total fee *</label>
+            <div class="input-affix"><span class="input-affix__sym" aria-hidden="true">₹</span>
+              <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" class="input" formControlName="amount" placeholder="0" /></div>
+            <small>Full project price</small>
+          </div>
+          <div class="field">
+            <label for="advance">Advance (online)</label>
+            <div class="input-affix"><span class="input-affix__sym" aria-hidden="true">₹</span>
+              <input id="advance" type="number" inputmode="decimal" min="0" step="0.01" class="input" formControlName="advance" placeholder="0" /></div>
+            <small>Paid via Razorpay after signing · 0 = none</small>
+          </div>
+          <div class="field">
+            <label for="validUntil">Valid until</label>
+            <input id="validUntil" type="date" class="input" formControlName="validUntil" [min]="today" />
+            <small>Client can't sign after this date</small>
+          </div>
         </div>
+        @if (totals(); as t) {
+          <div class="summary" aria-live="polite">
+            <div><span>Total</span><strong>{{ t.total }}</strong></div>
+            <div><span>Advance</span><strong>{{ t.advance }}</strong></div>
+            <div><span>Balance</span><strong [class.bad]="t.invalid">{{ t.balance }}</strong></div>
+          </div>
+          @if (t.invalid) { <p class="adm-alert">Advance cannot be more than the total fee.</p> }
+        }
       </fieldset>
 
       <fieldset>
@@ -76,6 +99,12 @@ const DEFAULT_TERMS = `1. Scope: Work is limited to the deliverables listed in t
     .row { display: grid; gap: 1.1rem; }
     @media (min-width: 760px) { .row { grid-template-columns: 1fr 1fr; } .row--3 { grid-template-columns: 1fr 1fr 1fr; } }
     .actions { display: flex; gap: 1rem; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .summary div { background: var(--bg); padding: .85rem 1rem; display: grid; gap: .15rem; }
+    .summary span { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); font-weight: 700; }
+    .summary strong { font-family: var(--f-display); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .summary strong.bad { color: #fca5a5; }
+    @media (max-width: 600px) { .summary { grid-template-columns: 1fr; } .summary div { grid-template-columns: 1fr auto; align-items: center; } }
   `,
 })
 export class ProposalEditorComponent {
@@ -97,6 +126,17 @@ export class ProposalEditorComponent {
     advance: [0, [Validators.min(0)]],
     validUntil: [this.defaultValidity()],
     terms: [DEFAULT_TERMS, Validators.required],
+  });
+
+  protected readonly today = new Date().toISOString().slice(0, 10);
+  private readonly formValue = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+  /** Live Total / Advance / Balance shown under the money fields. */
+  protected readonly totals = computed(() => {
+    const v = this.formValue();
+    const total = Math.round(Number(v.amount || 0) * 100);
+    const advance = Math.round(Number(v.advance || 0) * 100);
+    if (!total && !advance) return null;
+    return { total: formatINR(total), advance: formatINR(advance), balance: formatINR(Math.max(total - advance, 0)), invalid: advance > total };
   });
 
   constructor() {
