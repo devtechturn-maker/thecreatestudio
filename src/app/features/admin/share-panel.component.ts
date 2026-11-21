@@ -139,11 +139,42 @@ export class SharePanelComponent {
       setTimeout(() => this.copied.set(false), 2000);
       this.record('COPY');
     };
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(this.message()).then(done, () => this.error.set('Could not copy. Select the link below instead.'));
+    this.error.set('');
+    const text = this.message();
+    // Modern clipboard API only exists on HTTPS; fall back to the classic method on plain HTTP.
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, () => (this.legacyCopy(text) ? done() : this.copyFailed()));
+    } else if (this.legacyCopy(text)) {
+      done();
     } else {
-      this.error.set('Copy is not supported in this browser. Select the link below instead.');
+      this.copyFailed();
     }
+  }
+
+  /** Copies via a temporary textarea + execCommand. Works on http and in iOS Safari. */
+  private legacyCopy(text: string): boolean {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    // Keep it on-screen but invisible: iOS refuses to select off-screen elements.
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;';
+    document.body.appendChild(ta);
+    let ok = false;
+    try {
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length); // required on iOS
+      ok = document.execCommand('copy');
+    } catch {
+      ok = false;
+    }
+    document.body.removeChild(ta);
+    window.getSelection()?.removeAllRanges();
+    return ok;
+  }
+
+  private copyFailed(): void {
+    this.error.set('Could not copy automatically. Open "Message preview", then press and hold the text to copy it.');
   }
 
   /** Logs the share in the audit trail. Failures are ignored — sharing itself already happened. */
