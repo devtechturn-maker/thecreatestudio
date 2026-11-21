@@ -18,7 +18,7 @@ import { IconComponent } from '../../shared/components/icon.component';
       <div class="channels">
         <a class="ch ch--wa" [href]="whatsappUrl()" target="_blank" rel="noopener noreferrer" (click)="record('WHATSAPP')">
           <app-icon name="whatsapp" [size]="22" />
-          <span><strong>WhatsApp</strong><small>{{ waTarget() }}</small></span>
+          <span><strong>WhatsApp</strong><small>Choose who to send it to</small></span>
         </a>
 
         @if (emailConfigured() && !signed()) {
@@ -38,10 +38,6 @@ import { IconComponent } from '../../shared/components/icon.component';
           <span><strong>{{ copied() ? 'Copied!' : 'Copy message' }}</strong><small>Paste anywhere</small></span>
         </button>
       </div>
-
-      @if (!phoneDigits()) {
-        <p class="hint">No client phone number saved. WhatsApp will ask you to pick the contact.</p>
-      }
       @if (!emailConfigured() && !signed()) {
         <p class="hint">Website email (SMTP) isn't set up, so "Send email" is hidden. "Email app" still works.</p>
       }
@@ -90,15 +86,6 @@ export class SharePanelComponent {
 
   protected readonly signed = computed(() => ['SIGNED', 'PAID'].includes(this.proposal().status));
 
-  /** WhatsApp needs the number with country code and no symbols. 10-digit numbers are treated as Indian (+91). */
-  protected readonly phoneDigits = computed(() => {
-    let d = (this.proposal().clientPhone ?? '').replace(/\D/g, '');
-    if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
-    if (d.length === 10) d = '91' + d;
-    return d.length >= 11 && d.length <= 15 ? d : '';
-  });
-  protected readonly waTarget = computed(() => (this.phoneDigits() ? '+' + this.phoneDigits() : 'Choose contact in WhatsApp'));
-
   protected readonly message = computed(() => {
     const p = this.proposal();
     const first = p.clientName.split(' ')[0];
@@ -114,8 +101,12 @@ export class SharePanelComponent {
       + `Feel free to reach out if you have any questions.\n— TheCreateStudio`;
   });
 
+  /**
+   * Opens WhatsApp with the message ready and lets the admin pick the recipient
+   * (like forwarding): no number in the link, so WhatsApp shows its contact/chat picker.
+   */
   protected readonly whatsappUrl = computed(
-    () => `https://wa.me/${this.phoneDigits()}?text=${encodeURIComponent(this.message())}`,
+    () => `https://api.whatsapp.com/send?text=${encodeURIComponent(this.message())}`,
   );
 
   protected readonly mailtoUrl = computed(() => {
