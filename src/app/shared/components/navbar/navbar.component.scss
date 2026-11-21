@@ -5,6 +5,9 @@
 }
 .nav--scrolled { background: rgba(7,25,28, .78); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-color: var(--line); }
 .nav--hidden { transform: translateY(-100%); }
+/* backdrop-filter traps position:fixed children (the full-screen menu) inside the 76px bar,
+   so it is switched off while the mobile menu is open. */
+.nav--open { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--bg); border-color: transparent; }
 .nav__inner { height: 100%; display: flex; align-items: center; gap: 2rem; }
 .nav__brand { position: relative; z-index: 2; }
 .nav__links { display: none; margin-left: auto; align-items: center; gap: .35rem; }
@@ -58,7 +61,7 @@
 .mobile__links { display: grid; gap: .25rem; }
 .m-line { overflow: hidden; }
 .m-line a {
-  display: block; font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 9vw, 3.4rem);
+  display: block; font-family: var(--f-display); font-weight: 600; font-size: clamp(1.75rem, 8.2vw, 3.4rem);
   letter-spacing: -.04em; line-height: 1.15; color: var(--text-2);
   &.is-active, &:hover { color: #fff; }
 }
