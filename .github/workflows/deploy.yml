@@ -58,10 +58,10 @@ jobs:
               chown tcs:tcs /opt/thecreatestudio-backend/app.jar
               systemctl restart thecreatestudio-backend
               for i in $(seq 1 60); do
-                curl -fs http://127.0.0.1:8080/actuator/health >/dev/null && break
+                curl -fs http://127.0.0.1:8095/actuator/health >/dev/null && break
                 sleep 2
               done
-              curl -fs http://127.0.0.1:8080/actuator/health >/dev/null || { echo "Backend failed to start"; journalctl -u thecreatestudio-backend -n 50 --no-pager; exit 1; }
+              curl -fs http://127.0.0.1:8095/actuator/health >/dev/null || { echo "Backend failed to start"; journalctl -u thecreatestudio-backend -n 50 --no-pager; exit 1; }
               echo "Backend healthy."
             fi
             rm -rf /var/www/thecreatestudio/*
