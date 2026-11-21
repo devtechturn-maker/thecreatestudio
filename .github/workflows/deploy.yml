@@ -40,10 +40,14 @@ jobs:
             # ---- Backend (Spring Boot) — only once the server is set up for it
             #      (Java installed and the systemd service file present). Built and
             #      tested BEFORE anything live is replaced.
+            # Always build with Java 21, even if the server's default "java" is another version.
+            JAVA21=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1)
             BACKEND=0
-            if command -v java >/dev/null 2>&1 && [ -f /etc/systemd/system/thecreatestudio-backend.service ]; then
+            if [ -n "$JAVA21" ] && [ -x "$JAVA21/bin/javac" ] && [ -f /etc/systemd/system/thecreatestudio-backend.service ]; then
               BACKEND=1
-              (cd backend && chmod +x mvnw && ./mvnw -q -B package)
+              (cd backend && chmod +x mvnw && JAVA_HOME="$JAVA21" PATH="$JAVA21/bin:$PATH" ./mvnw -q -B package)
+            elif [ -f /etc/systemd/system/thecreatestudio-backend.service ]; then
+              echo "Java 21 JDK not found. Run: apt install -y openjdk-21-jdk-headless"; exit 1
             else
               echo "Backend not set up on this server yet — skipping backend deploy."
             fi
@@ -54,6 +58,11 @@ jobs:
 
             # ---- Go live (only reached if every build above succeeded)
             if [ "$BACKEND" = "1" ]; then
+              # Keep the installed systemd unit in sync with the repo (e.g. Java 21 path).
+              if ! cmp -s deploy/thecreatestudio-backend.service /etc/systemd/system/thecreatestudio-backend.service; then
+                cp deploy/thecreatestudio-backend.service /etc/systemd/system/thecreatestudio-backend.service
+                systemctl daemon-reload
+              fi
               cp backend/target/backend-*.jar /opt/thecreatestudio-backend/app.jar
               chown tcs:tcs /opt/thecreatestudio-backend/app.jar
               systemctl restart thecreatestudio-backend

@@ -81,7 +81,7 @@ See [`deploy/backend.env.example`](../deploy/backend.env.example): DB, `JWT_SECR
 
 ```bash
 # 1. Java 21
-apt update && apt install -y openjdk-21-jre-headless
+apt update && apt install -y openjdk-21-jdk-headless
 # 2. PostgreSQL (skip if already installed) + database and user
 apt install -y postgresql
 sudo -u postgres psql -c "CREATE ROLE tcs_app LOGIN PASSWORD 'CHOOSE-A-STRONG-PASSWORD';"
