@@ -66,7 +66,7 @@ import { SITE, whatsappLink } from '../../core/config/site.config';
         </div>
       </div>
 
-      <div class="footer__big" aria-hidden="true">WE CREATE. YOU GROW.</div>
+      <div class="footer__big" aria-hidden="true"><span>WE CREATE.</span> <span>YOU GROW.</span></div>
 
       <div class="footer__bottom">
         <p>© {{ year }} TheCreateStudio. All rights reserved.</p>
@@ -87,7 +87,9 @@ import { SITE, whatsappLink } from '../../core/config/site.config';
     .footer__social { display: flex; gap: .6rem; margin-top: 1.5rem; }
     .footer__social a { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; transition: all .4s var(--ease); }
     .footer__social a:hover { background: var(--grad); border-color: transparent; color: var(--on-accent); transform: translateY(-3px); }
-    .footer__big { font-family: var(--f-display); font-weight: 700; letter-spacing: -.05em; font-size: clamp(2.6rem, 10.5vw, 10rem); line-height: .9; margin: clamp(3rem, 7vw, 6rem) 0 1.5rem; white-space: nowrap; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .footer__big { font-family: var(--f-display); font-weight: 700; letter-spacing: -.05em; font-size: clamp(2.6rem, 10.5vw, 10rem); line-height: .9; margin: clamp(3rem, 7vw, 6rem) 0 1.5rem; padding-bottom: .08em; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .footer__big span { display: inline-block; white-space: nowrap; }
+    @media (max-width: 700px) { .footer__big { font-size: 15vw; line-height: .95; } .footer__big span { display: block; } }
     .footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding: 1.5rem 0 2rem; border-top: 1px solid var(--line); color: var(--text-2); font-size: .85rem; }
     .footer__bottom a { color: var(--text-2); font-size: .85rem; }
     @media (min-width: 900px) { .footer__top { grid-template-columns: 1.6fr 1fr 1fr 1fr 1.3fr; } .footer__about { grid-column: auto; } }
