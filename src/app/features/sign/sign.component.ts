@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon.component';
 import { SignaturePadComponent } from '../../shared/components/signature-pad.component';
 import { PublicProposalsApi } from '../../core/api/proposals.api';
+import { ClientAccount, LedgerApi, METHOD_LABELS } from '../../core/api/ledger.api';
+import { PaymentSummaryComponent } from '../../shared/components/payment-summary.component';
 import { ClientProposal, apiError, formatINR } from '../../core/api/api.models';
 
 declare global {
@@ -14,7 +16,7 @@ declare global {
 /** Public page where a client reviews, accepts, signs and (optionally) pays for a proposal. */
 @Component({
   selector: 'app-sign',
-  imports: [DatePipe, FormsModule, RouterLink, IconComponent, SignaturePadComponent],
+  imports: [DatePipe, FormsModule, RouterLink, IconComponent, SignaturePadComponent, PaymentSummaryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './sign.component.html',
   styleUrl: './sign.component.scss',
@@ -24,6 +26,10 @@ export class SignComponent {
 
   private readonly api = inject(PublicProposalsApi);
   private readonly doc = inject(DOCUMENT);
+  private readonly ledger = inject(LedgerApi);
+  protected readonly account = signal<ClientAccount | null>(null);
+  protected readonly accountError = signal('');
+  protected readonly labels = METHOD_LABELS;
 
   protected readonly p = signal<ClientProposal | null>(null);
   protected readonly loading = signal(true);
@@ -57,7 +63,7 @@ export class SignComponent {
           this.p.set(p);
           if (!this.signerName()) this.signerName.set(p.clientName);
           this.loading.set(false);
-          if (p.paymentDue) this.checkPayments();
+          this.loadAccount();
         },
         error: (e) => {
           this.loadError.set(e?.status === 404 ? 'This link is invalid or no longer available.' : apiError(e));
@@ -76,7 +82,7 @@ export class SignComponent {
         this.p.set(p);
         this.submitting.set(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        if (p.paymentDue) this.checkPayments();
+        this.loadAccount();
       },
       error: (e) => {
         this.error.set(apiError(e));
@@ -131,11 +137,28 @@ export class SignComponent {
         this.justPaid.set(true);
         this.paying.set(false);
         this.api.get(this.token()).subscribe((p) => this.p.set(p));
+        this.loadAccount();
       },
       error: (e) => {
         this.payError.set(apiError(e, 'We could not confirm the payment yet. If money was deducted, it will be confirmed shortly.'));
         this.paying.set(false);
       },
+    });
+  }
+
+  protected refreshPayments(): void {
+    this.api.get(this.token()).subscribe({ next: (p) => this.p.set(p), error: () => {} });
+    this.loadAccount();
+  }
+
+  private loadAccount(): void {
+    this.accountError.set('');
+    this.ledger.clientAccount(this.token()).subscribe({
+      next: (a) => {
+        this.account.set(a);
+        if (a.balance.dueNowPaise > 0) this.checkPayments();
+      },
+      error: (e) => this.accountError.set(apiError(e, 'Could not load your payment details. Please refresh the page.')),
     });
   }
 

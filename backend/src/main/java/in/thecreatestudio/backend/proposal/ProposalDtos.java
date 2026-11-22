@@ -18,8 +18,6 @@ final class ProposalDtos {
                              @NotBlank String signature,
                              boolean acceptTerms) {}
 
-    record MarkPaidRequest(@Size(max = 300) String note) {}
-
     record ProposalSummary(UUID id, String number, String title, String clientName, String clientCompany,
                            long amountPaise, String currency, ProposalStatus status, boolean expired,
                            Instant createdAt, Instant sentAt, Instant clientSignedAt, Instant paidAt) {
@@ -62,13 +60,13 @@ final class ProposalDtos {
                               String scope, String terms, String currency, long amountPaise, long advancePaise,
                               LocalDate validUntil, ProposalStatus status, boolean expired, String ownerSignerName,
                               String ownerSignature, Instant ownerSignedAt, String clientSignerName,
-                              String clientSignature, Instant clientSignedAt, boolean paymentDue, Instant paidAt) {
+                              String clientSignature, Instant clientSignedAt, Instant paidAt) {
         static ClientProposalView of(Proposal p) {
             return new ClientProposalView(p.getNumber(), p.getTitle(), p.getClientName(), p.getClientCompany(),
                     p.getSummary(), p.getScope(), p.getTerms(), p.getCurrency(), p.getAmountPaise(), p.getAdvancePaise(),
                     p.getValidUntil(), p.getStatus(), p.isExpired(), p.getOwnerSignerName(), p.getOwnerSignature(),
                     p.getOwnerSignedAt(), p.getClientSignerName(), p.getClientSignature(), p.getClientSignedAt(),
-                    p.paymentDue(), p.getPaidAt());
+                    p.getPaidAt());
         }
     }
 

@@ -1,0 +1,137 @@
+<section class="adm-card pay" aria-labelledby="payments-title">
+  <h2 id="payments-title" class="h4">Payments</h2>
+
+  @if (account(); as a) {
+    <app-payment-summary [balance]="a.balance" />
+
+    @if (hasTest()) {
+      <p class="adm-note">Includes a Razorpay <strong>test</strong> payment. It is not real money. Cancel it below before tracking real payments.</p>
+    }
+
+    <div class="actions">
+      @if (a.balance.balancePaise > 0) {
+        <button type="button" class="btn btn--primary btn--sm" (click)="toggle('record')" [attr.aria-expanded]="mode() === 'record'">Record payment</button>
+      }
+      @if (canRequest()) {
+        <button type="button" class="btn btn--ghost btn--sm" (click)="toggle('due')" [attr.aria-expanded]="mode() === 'due'">Set amount due</button>
+      }
+      <a class="btn btn--ghost btn--sm" [href]="whatsappUrl()" target="_blank" rel="noopener noreferrer">WhatsApp update</a>
+      @if (emailConfigured()) {
+        <button type="button" class="btn btn--ghost btn--sm" (click)="email()" [disabled]="busy()">Email update</button>
+      }
+    </div>
+
+    @if (mode() === 'record') {
+      <form class="box" [formGroup]="recordForm" (ngSubmit)="record()" novalidate>
+        <h3>Record money received</h3>
+        <div class="fields">
+          <div class="field">
+            <label for="rec-amount">Amount received *</label>
+            <div class="input-affix"><span class="input-affix__sym" aria-hidden="true">₹</span>
+              <input id="rec-amount" class="input" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="amount" /></div>
+            <button type="button" class="text-btn" (click)="fillBalance('record')">Full balance {{ inr(a.balance.balancePaise) }}</button>
+          </div>
+          <div class="field">
+            <label for="rec-method">Paid by *</label>
+            <select id="rec-method" class="input" formControlName="method">
+              @for (m of offlineMethods; track m) { <option [value]="m">{{ labels[m] }}</option> }
+            </select>
+          </div>
+          <div class="field">
+            <label for="rec-date">Received on *</label>
+            <input id="rec-date" class="input" type="date" [max]="today" formControlName="paidOn" />
+          </div>
+          <div class="field">
+            <label for="rec-ref">Receipt / reference</label>
+            <input id="rec-ref" class="input" maxlength="120" formControlName="reference" />
+            <small>The client can see this</small>
+          </div>
+          <div class="field wide">
+            <label for="rec-note">Private note</label>
+            <input id="rec-note" class="input" maxlength="500" formControlName="note" />
+            <small>Only you can see this</small>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn--primary btn--sm" [disabled]="busy()">Save payment</button>
+          <button type="button" class="text-btn" (click)="toggle('record')">Close</button>
+        </div>
+      </form>
+    }
+
+    @if (mode() === 'due') {
+      <form class="box" [formGroup]="dueForm" (ngSubmit)="saveDue()" novalidate>
+        <h3>Ask the client to pay</h3>
+        <div class="fields">
+          <div class="field">
+            <label for="due-amount">Amount due now *</label>
+            <div class="input-affix"><span class="input-affix__sym" aria-hidden="true">₹</span>
+              <input id="due-amount" class="input" type="number" inputmode="decimal" step="0.01" min="0" formControlName="amount" /></div>
+            <button type="button" class="text-btn" (click)="fillBalance('due')">Full balance {{ inr(a.balance.balancePaise) }}</button>
+          </div>
+          <div class="field">
+            <label for="due-date">Pay by</label>
+            <input id="due-date" class="input" type="date" [min]="today" formControlName="date" />
+          </div>
+          <div class="field wide">
+            <label for="due-note">What is it for?</label>
+            <input id="due-note" class="input" maxlength="300" placeholder="e.g. Second instalment" formControlName="note" />
+            <small>The client can see this</small>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn--primary btn--sm" [disabled]="busy()">Save amount due</button>
+          @if (a.balance.dueNowPaise > 0) {
+            <button type="button" class="text-btn" (click)="saveDue(0)" [disabled]="busy()">Don't request payment now</button>
+          }
+        </div>
+      </form>
+    }
+
+    @if (notice()) { <p class="adm-note" role="status">{{ notice() }}</p> }
+    @if (error()) { <p class="adm-alert" role="alert">{{ error() }}</p> }
+
+    <h3>Payment history</h3>
+    <ul class="history">
+      @for (e of a.entries; track e.id) {
+        <li [class.cancelled]="e.voidedAt">
+          <div class="entry">
+            <div>
+              <strong>{{ labels[e.method] }}</strong>
+              @if (e.testMode) { <span class="chip chip--demo">Test</span> }
+              <small>{{ e.paidOn | date: 'd MMM y' }} · recorded by {{ e.recordedBy }}</small>
+              @if (e.reference) { <small>Ref: {{ e.reference }}</small> }
+              @if (e.note) { <small>Note: {{ e.note }}</small> }
+              @if (e.voidedAt) { <small class="why">Cancelled by {{ e.voidedBy }}: {{ e.voidReason }}</small> }
+            </div>
+            <div class="amount">
+              <b>{{ inr(e.amountPaise) }}</b>
+              @if (!e.voidedAt && cancelling() !== e.id) {
+                <button type="button" class="text-btn text-btn--danger" (click)="startCancel(e.id)">Cancel entry</button>
+              }
+            </div>
+          </div>
+          @if (cancelling() === e.id) {
+            <div class="confirm">
+              <label [for]="'reason-' + e.id">Why cancel it? (mistake, refund…)</label>
+              <input [id]="'reason-' + e.id" class="input" maxlength="300" [formControl]="reason" />
+              @if (e.method === 'ONLINE') {
+                <small>This only updates your records. To return the money, refund it in the Razorpay dashboard.</small>
+              }
+              <div class="actions">
+                <button type="button" class="btn btn--ghost btn--sm" (click)="confirmCancel(e.id)" [disabled]="busy()">Confirm cancel</button>
+                <button type="button" class="text-btn" (click)="cancelling.set(null)">Keep it</button>
+              </div>
+            </div>
+          }
+        </li>
+      } @empty {
+        <li class="empty">No payments received yet.</li>
+      }
+    </ul>
+  } @else if (error()) {
+    <p class="adm-alert" role="alert">{{ error() }}</p>
+  } @else {
+    <p class="empty" role="status">Loading payments…</p>
+  }
+</section>

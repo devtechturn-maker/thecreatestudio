@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { AdminProposalsApi } from '../../core/api/proposals.api';
-import { AdminProposal, apiError, formatINR } from '../../core/api/api.models';
+import { AdminProposal, apiError } from '../../core/api/api.models';
 import { IconComponent } from '../../shared/components/icon.component';
 
 /**
@@ -91,8 +91,7 @@ export class SharePanelComponent {
     const p = this.proposal();
     const first = p.clientName.split(' ')[0];
     if (this.signed()) {
-      const pay = p.status === 'SIGNED' && p.advancePaise > 0
-        ? `\n\nYou can also pay the advance of ${formatINR(p.advancePaise)} securely from the same link.` : '';
+      const pay = '\n\nThe same link shows your payments and any amount due.';
       return `Hi ${first},\n\nThank you for signing "${p.title}" (${p.number}) with TheCreateStudio! 🎉\n\n`
         + `You can view and download your signed agreement here:\n${p.signingUrl}${pay}\n\nWe're excited to get started!\n— TheCreateStudio`;
     }

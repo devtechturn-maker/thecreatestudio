@@ -1,6 +1,7 @@
 package in.thecreatestudio.backend.payment;
 
 import in.thecreatestudio.backend.common.ClientInfo;
+import in.thecreatestudio.backend.proposal.LedgerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +31,10 @@ class PublicPaymentController {
 
     private final PaymentService service;
 
-    PublicPaymentController(PaymentService service) {
+    private final LedgerService ledger;
+
+    PublicPaymentController(PaymentService service, LedgerService ledger) {
+        this.ledger = ledger;
         this.service = service;
     }
 
@@ -46,7 +50,8 @@ class PublicPaymentController {
 
     @PostMapping("/verify")
     Map<String, Object> verify(@PathVariable String token, @Valid @RequestBody VerifyRequest body, HttpServletRequest req) {
-        service.verifyCheckout(token, body.orderId(), body.paymentId(), body.signature(), ClientInfo.from(req));
+        service.verifyCheckout(token, body.orderId(), body.paymentId(), body.signature(), ClientInfo.from(req))
+                .ifPresent(ledger::emailReceipt); // after the payment is committed
         return Map.of("paid", true);
     }
 }
@@ -65,7 +70,10 @@ class RazorpayWebhookController {
     private final PaymentService service;
     private final ObjectMapper mapper;
 
-    RazorpayWebhookController(RazorpayClient razorpay, PaymentService service, ObjectMapper mapper) {
+    private final LedgerService ledger;
+
+    RazorpayWebhookController(RazorpayClient razorpay, PaymentService service, ObjectMapper mapper, LedgerService ledger) {
+        this.ledger = ledger;
         this.razorpay = razorpay;
         this.service = service;
         this.mapper = mapper;
@@ -86,7 +94,7 @@ class RazorpayWebhookController {
         String paymentId = payment.path("id").asString(null);
         String method = payment.path("method").asString(null);
         String error = payment.path("error_description").asString(null);
-        if (orderId != null) service.onWebhook(event, orderId, paymentId, method, error);
+        if (orderId != null) service.onWebhook(event, orderId, paymentId, method, error).ifPresent(ledger::emailReceipt);
         return ResponseEntity.ok().build();
     }
 }

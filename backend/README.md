@@ -29,10 +29,17 @@ Admin creates proposal (DRAFT) ──► Admin signs ──► Send (content loc
 | GET | `/api/auth/me` | admin |
 | GET/POST | `/api/admin/proposals` | admin: list (filter `?status=`) / create |
 | GET/PUT | `/api/admin/proposals/{id}` | admin: view / edit (DRAFT only) |
-| POST | `/api/admin/proposals/{id}/sign` · `/send` · `/cancel` · `/mark-paid` | admin |
+| POST | `/api/admin/proposals/{id}/sign` · `/send` · `/cancel` | admin |
 | GET | `/api/admin/proposals/{id}/pdf` | admin |
 | POST | `/api/admin/proposals/{id}/resend-email` | admin: email the signing link again, or the signed PDF once signed (needs SMTP) |
 | POST | `/api/admin/proposals/{id}/share` | admin: log a WhatsApp / email-app / copy share in the audit trail |
+| GET | `/api/admin/payments` | admin: every client's received, balance and due |
+| GET | `/api/admin/proposals/{id}/account` | admin: balance and payment history |
+| POST | `/api/admin/proposals/{id}/payments` | admin: record cash, UPI, bank, cheque or other |
+| POST | `/api/admin/proposals/{id}/payments/{entryId}/cancel` | admin: cancel an entry, with a reason |
+| PUT | `/api/admin/proposals/{id}/due` | admin: set the amount due now and its date |
+| POST | `/api/admin/proposals/{id}/payment-update` | admin: email the client a payment summary |
+| GET | `/api/public/proposals/{token}/account` | client: paid, balance, due and history |
 | GET | `/api/admin/integrations` | admin: whether email and Razorpay are configured |
 | GET | `/api/public/proposals/{token}` · `/pdf` | client |
 | POST | `/api/public/proposals/{token}/sign` | client |

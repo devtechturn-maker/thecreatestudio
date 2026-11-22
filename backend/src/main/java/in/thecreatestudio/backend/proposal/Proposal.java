@@ -113,6 +113,15 @@ public class Proposal {
     @Column(name = "first_viewed_at")
     private Instant firstViewedAt;
 
+    @Column(name = "requested_total_paise")
+    private Long requestedTotalPaise;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column(name = "due_note")
+    private String dueNote;
+
     @Column(name = "paid_at")
     private Instant paidAt;
 
@@ -218,11 +227,30 @@ public class Proposal {
         this.signedPdfHash = Hashing.sha256Hex(pdf);
     }
 
-    void markPaid() {
-        if (status == ProposalStatus.PAID) return;
-        requireStatus("marked as paid", ProposalStatus.SIGNED);
-        this.status = ProposalStatus.PAID;
-        this.paidAt = Instant.now();
+    /** PAID means the whole fee has been received; cancelling a payment re-opens it. */
+    void syncPaid(long receivedPaise) {
+        boolean complete = amountPaise > 0 && receivedPaise >= amountPaise;
+        if (status == ProposalStatus.SIGNED && complete) {
+            status = ProposalStatus.PAID;
+            paidAt = Instant.now();
+        } else if (status == ProposalStatus.PAID && !complete) {
+            status = ProposalStatus.SIGNED;
+            paidAt = null;
+        }
+        touch(); // always bump the version, even when the status is unchanged
+    }
+
+    void requestPayment(long requestedTotal, LocalDate by, String note) {
+        this.requestedTotalPaise = requestedTotal;
+        this.dueDate = by;
+        this.dueNote = note;
+    }
+
+    /** Amount the client should pay now: what was requested so far, minus what was received. */
+    long dueNow(long receivedPaise) {
+        if (status != ProposalStatus.SIGNED) return 0;
+        long requested = requestedTotalPaise == null ? advancePaise : requestedTotalPaise;
+        return Math.max(Math.min(requested, amountPaise) - receivedPaise, 0);
     }
 
     void cancel() {
@@ -233,10 +261,6 @@ public class Proposal {
 
     boolean isExpired() {
         return validUntil != null && LocalDate.now(BUSINESS_ZONE).isAfter(validUntil);
-    }
-
-    boolean paymentDue() {
-        return status == ProposalStatus.SIGNED && advancePaise > 0;
     }
 
     /** SHA-256 of everything the client agrees to — proves the signed text was not altered. */
@@ -296,6 +320,8 @@ public class Proposal {
     public Instant getTermsAcceptedAt() { return termsAcceptedAt; }
     public Instant getSentAt() { return sentAt; }
     public Instant getFirstViewedAt() { return firstViewedAt; }
+    public LocalDate getDueDate() { return dueDate; }
+    public String getDueNote() { return dueNote; }
     public Instant getPaidAt() { return paidAt; }
     public Instant getCancelledAt() { return cancelledAt; }
     public byte[] getSignedPdf() { return signedPdf; }

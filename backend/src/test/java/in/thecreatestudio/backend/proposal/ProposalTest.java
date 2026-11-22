@@ -35,7 +35,7 @@ class ProposalTest {
         p.markViewed();
         p.clientSign("Client", SIG, INFO);
         assertEquals(ProposalStatus.SIGNED, p.getStatus());
-        p.markPaid();
+        p.syncPaid(100_00);
         assertEquals(ProposalStatus.PAID, p.getStatus());
     }
 
@@ -80,7 +80,8 @@ class ProposalTest {
     @Test
     void cannotPayBeforeSigning() {
         Proposal p = draft();
-        assertThrows(ApiException.class, p::markPaid);
+        p.syncPaid(100_00);
+        assertEquals(ProposalStatus.DRAFT, p.getStatus());
     }
 
     @Test

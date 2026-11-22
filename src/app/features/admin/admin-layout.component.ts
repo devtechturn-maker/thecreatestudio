@@ -15,6 +15,7 @@ import { AuthService } from '../../core/api/auth.service';
         @if (auth.isLoggedIn()) {
           <nav aria-label="Admin">
             <a routerLink="/admin/proposals" routerLinkActive="is-active">Proposals</a>
+            <a routerLink="/admin/payments" routerLinkActive="is-active">Payments</a>
             <a routerLink="/admin/proposals/new" class="btn btn--primary btn--sm">New proposal</a>
           </nav>
           <div class="bar__user">
@@ -31,7 +32,7 @@ import { AuthService } from '../../core/api/auth.service';
     .bar__inner { max-width: 1240px; margin: auto; padding: .85rem var(--gutter); display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
     .bar__brand { display: inline-flex; align-items: center; gap: .75rem; }
     .tag { font-family: var(--f-alt); font-weight: 800; font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--on-accent); background: var(--yellow); padding: .2rem .5rem; border-radius: 6px; }
-    nav { display: flex; align-items: center; gap: 1rem; margin-left: auto; }
+    nav { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-left: auto; }
     nav > a:not(.btn) { font-family: var(--f-alt); font-weight: 700; color: var(--text-2); }
     nav > a.is-active, nav > a:not(.btn):hover { color: #fff; }
     .bar__user { display: flex; align-items: center; gap: .9rem; font-size: .85rem; }

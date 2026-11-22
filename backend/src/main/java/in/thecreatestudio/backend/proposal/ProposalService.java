@@ -22,10 +22,12 @@ public class ProposalService {
     private final ProposalEventRepository events;
     private final PdfService pdf;
     private final MailService mail;
+    private final PaymentEntryRepository received;
     private final AppProperties props;
 
     ProposalService(ProposalRepository proposals, ProposalEventRepository events, PdfService pdf,
-                    MailService mail, AppProperties props) {
+                    MailService mail, AppProperties props, PaymentEntryRepository received) {
+        this.received = received;
         this.proposals = proposals;
         this.events = events;
         this.pdf = pdf;
@@ -149,7 +151,7 @@ public class ProposalService {
         String body = "<p>Hi " + MailService.esc(p.getClientName()) + ",</p>"
                 + "<p>Thank you! <b>" + MailService.esc(p.getTitle()) + "</b> (" + p.getNumber()
                 + ") has been signed by both parties. A copy of the signed agreement is attached.</p>"
-                + (p.paymentDue() ? "<p>You can pay the advance online from the same link.</p>" : "");
+                + "<p>The same link shows your payments and any amount due.</p>";
         String text = "Hi " + p.getClientName() + ",\n\n\"" + p.getTitle() + "\" (" + p.getNumber()
                 + ") has been signed by both parties. The signed agreement is attached. You can also view it here:\n"
                 + url + "\n\n" + props.companyName();
@@ -160,7 +162,10 @@ public class ProposalService {
 
     @Transactional
     public Proposal cancel(UUID id, ClientInfo info) {
-        Proposal p = get(id);
+        Proposal p = proposals.findLockedById(id).orElseThrow(() -> ApiException.notFound("Proposal"));
+        if (received.totalReceived(id) > 0) {
+            throw ApiException.conflict("This proposal has payments. Cancel those payment entries first.");
+        }
         p.cancel();
         log(p, "CANCELLED", Actor.ADMIN, info, null);
         return p;
@@ -170,14 +175,6 @@ public class ProposalService {
     public byte[] pdfFor(UUID id) {
         Proposal p = get(id);
         return p.getSignedPdf() != null ? p.getSignedPdf() : pdf.render(p, history(id), false);
-    }
-
-    @Transactional
-    public Proposal markPaidManually(UUID id, String note, ClientInfo info) {
-        Proposal p = get(id);
-        p.markPaid();
-        log(p, "MARKED_PAID", Actor.ADMIN, info, note == null || note.isBlank() ? "Marked paid manually" : note);
-        return p;
     }
 
     public String signingUrl(Proposal p) {
@@ -196,13 +193,16 @@ public class ProposalService {
     @Transactional
     public Proposal clientSign(String token, String signerName, String signature, boolean acceptTerms, ClientInfo info) {
         if (!acceptTerms) throw ApiException.badRequest("Please accept the terms and conditions to continue.");
-        Proposal p = byToken(token);
+        Proposal p = proposals.findLockedByPublicToken(token)
+                .filter(x -> x.getStatus() != ProposalStatus.DRAFT && x.getStatus() != ProposalStatus.CANCELLED)
+                .orElseThrow(() -> ApiException.notFound("Proposal"));
         p.clientSign(signerName.trim(), SignatureImage.validate(signature), info);
         log(p, "TERMS_ACCEPTED", Actor.CLIENT, info, "Accepted the terms and conditions");
         log(p, "CLIENT_SIGNED", Actor.CLIENT, info, "Signed as " + signerName.trim());
 
         byte[] finalPdf = pdf.render(p, history(p.getId()), true);
         p.attachSignedPdf(finalPdf);
+        p.syncPaid(received.totalReceived(p.getId())); // money may have arrived before signing
         log(p, "AGREEMENT_SEALED", Actor.SYSTEM, null, "Signed PDF SHA-256 " + p.getSignedPdfHash().substring(0, 16) + "…");
 
         List<String> to = mail.fromAddress().isBlank()
@@ -229,16 +229,6 @@ public class ProposalService {
             throw ApiException.notFound("Proposal");
         }
         return p;
-    }
-
-    // ------------------------------------------------------------------ payments hook
-
-    @Transactional
-    public void recordPayment(UUID proposalId, String detail) {
-        Proposal p = get(proposalId);
-        if (p.getStatus() == ProposalStatus.PAID) return;
-        p.markPaid();
-        log(p, "PAID", Actor.SYSTEM, null, detail);
     }
 
     @Transactional

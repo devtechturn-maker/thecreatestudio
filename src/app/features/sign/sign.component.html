@@ -14,7 +14,7 @@
         <div class="banner banner--ok" role="status">
           <app-icon name="check" [size]="22" />
           <div>
-            <strong>{{ p.status === 'PAID' ? 'Signed and paid. Thank you!' : 'Signed by both parties. Thank you!' }}</strong>
+            <strong>{{ p.status === 'PAID' ? 'Signed and fully paid. Thank you!' : 'Signed by both parties. Thank you!' }}</strong>
             <span>Signed by {{ p.clientSignerName }} on {{ p.clientSignedAt | date: 'd MMM y, h:mm a' }}. Download your copy below.</span>
           </div>
         </div>
@@ -22,6 +22,7 @@
         <div class="banner banner--warn" role="alert">This proposal expired on {{ p.validUntil | date: 'd MMM y' }}. Please contact us for an updated proposal.</div>
       }
 
+      @if (accountError()) { <p class="alert" role="alert">{{ accountError() }}</p> }
       <header class="doc-head">
         <p class="eyebrow">Proposal {{ p.number }}</p>
         <h1 class="h2">{{ p.title }}</h1>
@@ -100,20 +101,46 @@
         </section>
       }
 
-      <!-- Payment -->
-      @if (p.paymentDue) {
-        <section class="panel panel--pay" aria-labelledby="pay-title">
-          <h2 id="pay-title" class="h3">Pay advance: {{ inr(p.advancePaise) }}</h2>
-          @if (paymentsEnabled()) {
-            <p class="muted">Pay securely via Razorpay (UPI, cards, net banking, wallets).</p>
-            @if (payError()) { <p class="alert" role="alert">{{ payError() }}</p> }
-            <button type="button" class="btn btn--primary" (click)="pay()" [disabled]="paying()">
-              @if (paying()) { <span class="spinner" aria-hidden="true"></span> Processing… } @else { Pay {{ inr(p.advancePaise) }} }
-            </button>
-          } @else {
-            <p class="muted">Online payment isn't available yet. We'll share payment details with you directly.</p>
-          }
-        </section>
+      <!-- Payments -->
+      @if (account(); as a) {
+        @if (p.status === 'SIGNED' || p.status === 'PAID' || a.balance.paidPaise > 0) {
+          <section class="panel panel--pay" aria-labelledby="pay-title">
+            <div class="pay-head">
+              <h2 id="pay-title" class="h3">Your payments</h2>
+              <button type="button" class="refresh" (click)="refreshPayments()">Refresh</button>
+            </div>
+            <app-payment-summary [balance]="a.balance" />
+
+            @if (a.balance.dueNowPaise > 0) {
+              @if (paymentsEnabled() && a.balance.dueNowPaise >= 100) {
+                <p class="muted">Pay securely via Razorpay (UPI, cards, net banking, wallets). Cash payments will appear here once we record them.</p>
+                @if (payError()) { <p class="alert" role="alert">{{ payError() }}</p> }
+                <button type="button" class="btn btn--primary" (click)="pay()" [disabled]="paying()">
+                  @if (paying()) { <span class="spinner" aria-hidden="true"></span> Processing… } @else { Pay {{ inr(a.balance.dueNowPaise) }} online }
+                </button>
+              } @else {
+                <p class="muted">Online payment isn't available for this amount right now. Please contact us to pay by cash, UPI or bank transfer.</p>
+              }
+            } @else if (a.balance.balancePaise > 0 && p.status === 'SIGNED') {
+              <p class="muted">Nothing to pay right now. We'll let you know when the next payment is due.</p>
+            }
+
+            <h3 class="pay-title">Payment history</h3>
+            <ul class="history">
+              @for (e of a.entries; track $index) {
+                <li>
+                  <span>
+                    <strong>{{ labels[e.method] }}{{ e.testMode ? ' (test, not real money)' : '' }}</strong>
+                    <small>{{ e.paidOn | date: 'd MMM y' }}@if (e.reference) { · {{ e.reference }} }</small>
+                  </span>
+                  <b>{{ inr(e.amountPaise) }}</b>
+                </li>
+              } @empty {
+                <li class="muted">No payments received yet.</li>
+              }
+            </ul>
+          </section>
+        }
       }
       @if (justPaid()) {
         <div class="banner banner--ok" role="status"><app-icon name="check" [size]="22" /><div><strong>Payment received. Thank you!</strong></div></div>

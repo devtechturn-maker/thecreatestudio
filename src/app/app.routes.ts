@@ -101,6 +101,12 @@ export const routes: Routes = [
         data: noindex('Admin Login'),
       },
       {
+        path: 'payments',
+        canActivate: [adminGuard],
+        data: noindex('Payments'),
+        loadComponent: () => import('./features/admin/payments.component').then((m) => m.PaymentsComponent),
+      },
+      {
         path: 'proposals',
         canActivate: [adminGuard],
         data: noindex('Proposals'),

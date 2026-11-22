@@ -42,10 +42,6 @@ export class AdminProposalsApi {
     return this.http.post<AdminProposal>(`${this.base}/${id}/cancel`, {});
   }
 
-  markPaid(id: string, note: string): Observable<AdminProposal> {
-    return this.http.post<AdminProposal>(`${this.base}/${id}/mark-paid`, { note });
-  }
-
   pdf(id: string): Observable<Blob> {
     return this.http.get(`${this.base}/${id}/pdf`, { responseType: 'blob' });
   }

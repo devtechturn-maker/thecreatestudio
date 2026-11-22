@@ -85,7 +85,6 @@ export interface ClientProposal {
   clientSignerName: string | null;
   clientSignature: string | null;
   clientSignedAt: string | null;
-  paymentDue: boolean;
   paidAt: string | null;
 }
 

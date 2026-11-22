@@ -26,6 +26,15 @@
 .sig__empty { color: #8a979a; font-style: italic; padding: 1.5rem 0; }
 
 .panel { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: clamp(1.5rem, 4vw, 2.5rem); display: grid; gap: 1.25rem; }
+.panel { grid-template-columns: minmax(0, 1fr); }
+.pay-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.refresh { color: var(--yellow); font-size: .85rem; font-weight: 700; min-height: 32px; }
+.pay-title { font-size: 1rem; }
+.history { display: grid; gap: .5rem; }
+.history li { display: flex; justify-content: space-between; gap: .75rem; padding: .7rem .9rem; border-radius: 14px; background: var(--bg); }
+.history li span { min-width: 0; overflow-wrap: anywhere; }
+.history small { display: block; color: var(--text-2); font-size: .78rem; }
+.history b { flex: none; }
 .panel--pay { border-color: rgba(254,225,25, .35); }
 .form { display: grid; gap: 1.4rem; }
 .label { font-family: var(--f-alt); font-weight: 600; font-size: .9rem; }

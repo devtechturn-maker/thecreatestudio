@@ -41,6 +41,9 @@ public class Payment {
 
     private String method;
 
+    @Column(name = "key_id")
+    private String keyId;
+
     @Column(name = "failure_reason")
     private String failureReason;
 
@@ -52,7 +55,8 @@ public class Payment {
 
     protected Payment() {}
 
-    Payment(UUID proposalId, String orderId, long amountPaise, String currency) {
+    Payment(UUID proposalId, String orderId, long amountPaise, String currency, String keyId) {
+        this.keyId = keyId;
         this.id = UUID.randomUUID();
         this.proposalId = proposalId;
         this.razorpayOrderId = orderId;
@@ -85,6 +89,7 @@ public class Payment {
         this.failureReason = reason == null ? null : reason.substring(0, Math.min(reason.length(), 300));
     }
 
+    public String getKeyId() { return keyId; }
     public UUID getId() { return id; }
     public UUID getProposalId() { return proposalId; }
     public String getRazorpayOrderId() { return razorpayOrderId; }

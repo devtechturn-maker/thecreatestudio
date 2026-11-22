@@ -8,10 +8,11 @@ import { AdminProposal, apiError, formatINR } from '../../core/api/api.models';
 import { SignaturePadComponent } from '../../shared/components/signature-pad.component';
 import { StatusBadgeComponent } from './status-badge.component';
 import { SharePanelComponent } from './share-panel.component';
+import { PaymentPanelComponent } from './payment-panel.component';
 
 @Component({
   selector: 'app-proposal-detail',
-  imports: [RouterLink, DatePipe, LowerCasePipe, FormsModule, SignaturePadComponent, StatusBadgeComponent, SharePanelComponent],
+  imports: [RouterLink, DatePipe, LowerCasePipe, FormsModule, SignaturePadComponent, StatusBadgeComponent, SharePanelComponent, PaymentPanelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './proposal-detail.component.html',
   styleUrl: './proposal-detail.component.scss',
@@ -27,7 +28,6 @@ export class ProposalDetailComponent {
   protected readonly busy = signal(false);
   protected readonly signerName = signal('');
   protected readonly signature = signal<string | null>(null);
-  protected readonly paidNote = signal('');
   protected readonly emailConfigured = signal(false);
   protected readonly emailProblem = signal('');
   protected readonly inr = formatINR;
@@ -80,12 +80,6 @@ export class ProposalDetailComponent {
     const p = this.p();
     if (!p || !confirm(`Cancel proposal ${p.number}? The client link will stop working.`)) return;
     this.run(this.api.cancel(this.id()), 'Proposal cancelled.');
-  }
-
-  markPaid(): void {
-    const p = this.p();
-    if (!p || !confirm(`Mark ${p.number} as paid outside Razorpay (e.g. bank transfer)?`)) return;
-    this.run(this.api.markPaid(this.id(), this.paidNote().trim()), 'Marked as paid.');
   }
 
   downloadPdf(): void {

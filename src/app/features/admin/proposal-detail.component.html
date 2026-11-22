@@ -38,19 +38,8 @@
         <app-share-panel [proposal]="p" [emailConfigured]="emailConfigured()" [emailProblem]="emailProblem()" (updated)="this.p.set($event)" />
       }
 
-      @if (p.status === 'SIGNED') {
-        <section class="adm-card step">
-          <h2 class="h4">Payment</h2>
-          @if (p.advancePaise > 0) {
-            <p class="muted">Advance of {{ inr(p.advancePaise) }} is due. The client can pay via Razorpay from the signing link. If they paid another way, record it here:</p>
-          } @else {
-            <p class="muted">No online advance was set. Record payment when received:</p>
-          }
-          <div class="link-row">
-            <input class="input" placeholder="Note, e.g. NEFT ref 12345" [ngModel]="paidNote()" (ngModelChange)="paidNote.set($event)" maxlength="300" />
-            <button type="button" class="btn btn--ghost btn--sm" (click)="markPaid()" [disabled]="busy()">Mark as paid</button>
-          </div>
-        </section>
+      @if (p.status !== 'DRAFT' && p.status !== 'CANCELLED') {
+        <app-payment-panel [proposal]="p" [emailConfigured]="emailConfigured()" (changed)="load(p.id)" />
       }
 
       <!-- Document -->

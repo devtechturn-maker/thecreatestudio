@@ -2,7 +2,6 @@ package in.thecreatestudio.backend.proposal;
 
 import in.thecreatestudio.backend.common.ClientInfo;
 import in.thecreatestudio.backend.proposal.ProposalDtos.AdminProposalView;
-import in.thecreatestudio.backend.proposal.ProposalDtos.MarkPaidRequest;
 import in.thecreatestudio.backend.proposal.ProposalDtos.PageView;
 import in.thecreatestudio.backend.proposal.ProposalDtos.ProposalSummary;
 import in.thecreatestudio.backend.proposal.ProposalDtos.SendResponse;
@@ -86,11 +85,6 @@ class AdminProposalController {
     @PostMapping("/{id}/cancel")
     AdminProposalView cancel(@PathVariable UUID id, HttpServletRequest req) {
         return view(service.cancel(id, ClientInfo.from(req)));
-    }
-
-    @PostMapping("/{id}/mark-paid")
-    AdminProposalView markPaid(@PathVariable UUID id, @Valid @RequestBody MarkPaidRequest body, HttpServletRequest req) {
-        return view(service.markPaidManually(id, body.note(), ClientInfo.from(req)));
     }
 
     @GetMapping("/{id}/pdf")

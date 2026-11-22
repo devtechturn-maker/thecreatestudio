@@ -1,0 +1,108 @@
+<div class="adm-head"><h1 class="h2">Payments</h1></div>
+
+@if (error()) { <p class="adm-alert" role="alert">{{ error() }}</p> }
+
+@if (data()) {
+  @let t = totals();
+  <dl class="cards">
+    <div class="card-total card-total--main">
+      <dt>Received</dt><dd>{{ inr(t.received) }}</dd>
+      <small>{{ inr(t.month) }} this month</small>
+    </div>
+    <div class="card-total"><dt>Online</dt><dd>{{ inr(t.online) }}</dd><small>Razorpay</small></div>
+    <div class="card-total"><dt>Cash</dt><dd>{{ inr(t.cash) }}</dd></div>
+    <div class="card-total"><dt>UPI, bank &amp; other</dt><dd>{{ inr(t.other) }}</dd></div>
+    <div class="card-total"><dt>Total balance</dt><dd class="y">{{ inr(t.balance) }}</dd><small>On signed proposals</small></div>
+    <div class="card-total" [class.card-total--late]="t.overdue > 0">
+      <dt>Due now</dt><dd>{{ inr(t.due) }}</dd>
+      <small>{{ inr(t.overdue) }} overdue</small>
+    </div>
+  </dl>
+  @if (t.test > 0) {
+    <p class="adm-note">{{ inr(t.test) }} of Razorpay test payments is not counted as received. Open those proposals and cancel the test entries so their balances are correct.</p>
+  }
+
+  <div class="bar">
+    <div class="switch" role="group" aria-label="View">
+      <button type="button" [class.on]="view() === 'clients'" [attr.aria-pressed]="view() === 'clients'" (click)="view.set('clients')">By client</button>
+      <button type="button" [class.on]="view() === 'history'" [attr.aria-pressed]="view() === 'history'" (click)="view.set('history')">All payments</button>
+    </div>
+    <input class="input" type="search" aria-label="Search" placeholder="Search client or proposal…" [value]="query()" (input)="query.set($any($event.target).value)" />
+    @if (view() === 'clients') {
+      <select class="input" aria-label="Show" (change)="show.set($any($event.target).value)">
+        <option value="all" [selected]="show() === 'all'">All clients</option>
+        <option value="due" [selected]="show() === 'due'">Due now</option>
+        <option value="overdue" [selected]="show() === 'overdue'">Overdue</option>
+        <option value="balance" [selected]="show() === 'balance'">Has a balance</option>
+        <option value="clear" [selected]="show() === 'clear'">Fully paid</option>
+      </select>
+    } @else {
+      <select class="input" aria-label="Payment method" (change)="method.set($any($event.target).value)">
+        <option value="all" [selected]="method() === 'all'">All methods</option>
+        @for (m of methods; track m) { <option [value]="m" [selected]="method() === m">{{ labels[m] }}</option> }
+      </select>
+      <input class="input" type="month" aria-label="Month" [value]="month()" (input)="month.set($any($event.target).value)" />
+    }
+  </div>
+
+  @if (view() === 'clients') {
+    <ul class="list">
+      @for (c of clients(); track c.key) {
+        <li class="adm-card client" [class.client--late]="c.overdue">
+          <div class="client__head">
+            <div class="who"><strong>{{ c.name }}</strong><small>{{ c.company ? c.company + ' · ' : '' }}{{ c.key }}</small></div>
+            <dl class="figures">
+              <div><dt>Total</dt><dd>{{ inr(c.total) }}</dd></div>
+              <div><dt>Received</dt><dd class="g">{{ inr(c.paid) }}</dd></div>
+              <div><dt>Balance</dt><dd class="y">{{ inr(c.balance) }}</dd></div>
+              <div><dt>{{ c.overdue ? 'Overdue' : 'Due now' }}</dt><dd [class.r]="c.overdue">{{ inr(c.due) }}</dd></div>
+            </dl>
+          </div>
+          <ul class="projects">
+            @for (p of c.projects; track p.id) {
+              <li>
+                <a [routerLink]="['/admin/proposals', p.id]">
+                  <span><b>{{ p.number }}</b> {{ p.title }}</span>
+                  <small [class.r]="p.overdue">
+                    @if (p.status === 'SENT' || p.status === 'VIEWED') { Not signed yet · }
+                    @if (p.dueNowPaise) {
+                      Due {{ inr(p.dueNowPaise) }}@if (p.dueDate) { by {{ p.dueDate | date: 'd MMM y' }} }
+                    } @else if (p.balancePaise) {
+                      Balance {{ inr(p.balancePaise) }}
+                    } @else {
+                      Fully paid
+                    }
+                  </small>
+                </a>
+              </li>
+            }
+          </ul>
+        </li>
+      } @empty {
+        <li class="adm-card empty">No clients match. A client appears here after signing, or once a payment is recorded.</li>
+      }
+    </ul>
+  } @else {
+    <p class="count">{{ history().length }} entries · {{ inr(historyTotal()) }} received</p>
+    <ul class="list">
+      @for (e of history(); track e.id) {
+        <li>
+          <a class="adm-card txn" [class.txn--cancelled]="e.cancelled" [routerLink]="['/admin/proposals', e.proposalId]">
+            <span class="who">
+              <strong>{{ e.clientName }}</strong>
+              <small>{{ e.paidOn | date: 'd MMM y' }} · {{ labels[e.method] }}{{ e.testMode ? ' (test)' : '' }} · {{ e.number }}</small>
+              @if (e.reference) { <small>Ref: {{ e.reference }}</small> }
+              @if (e.note) { <small>{{ e.note }}</small> }
+              @if (e.cancelled) { <small class="r">Cancelled: {{ e.voidReason }}</small> }
+            </span>
+            <b class="money">{{ inr(e.amountPaise) }}</b>
+          </a>
+        </li>
+      } @empty {
+        <li class="adm-card empty">No payments match.</li>
+      }
+    </ul>
+  }
+} @else if (!error()) {
+  <p class="empty" role="status">Loading…</p>
+}
