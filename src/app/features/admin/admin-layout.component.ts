@@ -27,7 +27,7 @@ import { AuthService } from '../../core/api/auth.service';
     <main id="main" class="adm" tabindex="-1"><router-outlet /></main>
   `,
   styles: `
-    .bar { position: sticky; top: 0; z-index: 50; background: rgba(7,25,28,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .bar { position: sticky; top: 0; z-index: 50; background: var(--teal-deep); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
     .bar__inner { max-width: 1240px; margin: auto; padding: .85rem var(--gutter); display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
     .bar__brand { display: inline-flex; align-items: center; gap: .75rem; }
     .tag { font-family: var(--f-alt); font-weight: 800; font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--on-accent); background: var(--yellow); padding: .2rem .5rem; border-radius: 6px; }

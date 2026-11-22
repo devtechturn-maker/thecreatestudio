@@ -91,12 +91,12 @@ import { MagneticDirective } from '../../shared/directives/magnetic.directive';
   styles: `
     .who__grid { display: grid; gap: 3rem; align-items: center; }
     @media (min-width: 1000px) { .who__grid { grid-template-columns: 1fr 1.2fr; } }
-    .who__brand { padding: 2rem; border-radius: var(--radius-lg); background: radial-gradient(circle at 30% 30%, rgba(255,224,27,.25), transparent 60%), var(--bg-2); border: 1px solid var(--line); min-height: 320px; display: grid; place-items: center; overflow: hidden; }
+    .who__brand { padding: 2rem; border-radius: var(--radius-lg); background: var(--teal-deep); border: 1px solid var(--line); min-height: 320px; display: grid; place-items: center; overflow: hidden; }
     .who__text { display: grid; gap: 1.5rem; }
     .who__text .h3 { font-size: clamp(1.6rem, 3vw, 2.5rem); }
     .mv { display: grid; gap: 1.5rem; }
     @media (min-width: 900px) { .mv { grid-template-columns: 1fr 1fr; } }
-    .mv__card { position: relative; overflow: hidden; display: grid; gap: 1.5rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: var(--radius-lg); background: radial-gradient(circle at 85% 10%, rgba(255,224,27,.25), transparent 55%), var(--teal); border: 1px solid rgba(255,224,27,.25); min-height: 340px; align-content: space-between; }
+    .mv__card { position: relative; overflow: hidden; display: grid; gap: 1.5rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: var(--radius-lg); background: var(--teal-card); border: 1px solid rgba(254,225,25,.25); min-height: 340px; align-content: space-between; }
     .mv__card--alt { background: var(--light); color: #111; }
     .mv__label { font-family: var(--f-alt); font-weight: 800; letter-spacing: .2em; text-transform: uppercase; font-size: .8rem; }
     .mv__text { font-family: var(--f-display); font-weight: 600; font-size: clamp(1.5rem, 2.8vw, 2.3rem); letter-spacing: -.03em; line-height: 1.15; }
@@ -110,7 +110,7 @@ import { MagneticDirective } from '../../shared/directives/magnetic.directive';
     .two { display: grid; gap: 3rem; }
     .two__cards { display: grid; gap: 1.5rem; }
     @media (min-width: 900px) { .two__cards { grid-template-columns: 1fr 1fr; } }
-    .two__card { display: grid; gap: 3rem; padding: 2rem; border-radius: var(--radius); background: #fff; border: 1px solid #e4e4e7; position: relative; transition: box-shadow .5s, background .5s, color .5s; }
+    .two__card { display: grid; gap: 3rem; padding: 2rem; border-radius: var(--radius); background: #fff; border: 1px solid var(--ice); position: relative; transition: box-shadow .5s, background .5s, color .5s; }
     .two__card span { font-family: var(--f-display); color: var(--purple); }
     .two__card strong { font-family: var(--f-display); font-size: clamp(1.4rem, 2.5vw, 2rem); letter-spacing: -.03em; line-height: 1.1; max-width: 14ch; }
     .two__card app-icon { position: absolute; right: 2rem; top: 2rem; }

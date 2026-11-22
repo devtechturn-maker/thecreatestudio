@@ -101,7 +101,7 @@ export class SignComponent {
               name: o.name,
               description: o.description,
               prefill: { name: o.prefillName, email: o.prefillEmail, contact: o.prefillContact ?? '' },
-              theme: { color: '#0a434b' },
+              theme: { color: '#08434b' },
               handler: (r: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
                 this.verify(r.razorpay_order_id, r.razorpay_payment_id, r.razorpay_signature),
               modal: { ondismiss: () => this.paying.set(false) },

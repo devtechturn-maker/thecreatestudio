@@ -1,40 +1,65 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
- * Typographic wordmark based on the TheCreateStudio logo:
- * "THE" in a yellow speech bubble with burst lines, bold white "CREATE",
- * and spaced yellow "STUDIO" beneath.
+ * TheCreateStudio.in logo, traced as SVG from the brand artwork so it stays sharp and can animate:
+ * burst lines flick on load and on hover, and the play button in the "C" nudges forward.
  */
 @Component({
   selector: 'app-brand',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <span class="brand" [class.brand--lg]="large()" role="img" aria-label="TheCreateStudio">
-      <span class="burst" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="the" aria-hidden="true">THE</span>
-      <span class="words" aria-hidden="true">
-        <span class="create">CRE<span class="a">A</span>TE</span>
-        <span class="studio">STUDIO</span>
-      </span>
-    </span>
+    <svg class="logo" [class.logo--lg]="large()" viewBox="312 417 572 202" role="img" aria-label="TheCreateStudio.in">
+      <g class="yellow burst">
+        <path d="M316 470q-2-9 6-8l40 21-2 4-42-13z" />
+        <path d="M332 434q1-7 9-5l23 38-4 3-27-31z" />
+        <path d="M369 425q4-6 9-2l4 46h-4z" />
+      </g>
+      <path class="yellow" d="M396 477h124q22 0 22 22v67q0 22-22 22h-8q4 18 29 28-40 0-56-28h-89q-23 0-23-22v-67q0-22 23-22z" />
+      <g class="teal">
+        <path d="M380 503h47v14h-16v48h-15v-48h-16z" />
+        <path d="M434 503h15v24h26v-24h15v62h-15v-24h-26v24h-15z" />
+        <path d="M500 503h34v13h-20v11h18v13h-18v12h20v13h-34z" />
+      </g>
+      <g class="cream">
+        <path d="M616 526h-15a17 17 0 1 0 0 20h15a31.5 31.5 0 1 1 0-20z" />
+        <path fill-rule="evenodd" d="M625 505h25c30 0 26 34 9 37l15 24h-17l-13-21h-5v21h-14zm14 12v16h10c13 0 13-16 0-16z" />
+        <path d="M681 505h36v12h-22v12h19v12h-19v13h22v12h-36z" />
+        <path d="M723 566l22-61h16l22 61h-15l-15-43-15 43z" />
+        <path d="M787 505h47v13h-16v48h-15v-48h-16z" />
+        <path d="M843 505h36v12h-22v12h19v12h-19v13h22v12h-36z" />
+      </g>
+      <path class="yellow play" d="M592 526l19 10-19 10z" />
+      <path class="yellow" d="M754 536l13 30h-26z" />
+      <g class="studio">
+        <path d="M594 593.5h-24c-5 0-5 7 0 7h19c5 0 5 7 0 7h-24" />
+        <path d="M610 593.5h28m-14 0v15" />
+        <path d="M654 592v10q0 5.5 6 5.5h15q6 0 6-5.5v-10" />
+        <path d="M699 593.5h17q9 0 9 7t-9 7h-17z" />
+        <path d="M742 592v17" />
+        <path d="M764 593.5h18q6 0 6 7t-6 7h-18q-6 0-6-7t6-7z" />
+        <path d="M804 607h4" />
+        <path d="M824 592v17" />
+        <path d="M840 609v-15.5h22q7 0 7 7v8.5" />
+      </g>
+    </svg>
   `,
   styles: `
-    .brand { --s: 1; position: relative; display: inline-flex; align-items: flex-start; gap: .28em; font-family: var(--f-display); font-size: calc(1.35rem * var(--s)); line-height: 1; padding-top: .35em; }
-    .burst { position: absolute; left: -.35em; top: -.05em; width: .7em; height: .6em; }
-    .burst i { position: absolute; bottom: 0; left: 50%; width: .09em; height: .38em; border-radius: .05em; background: var(--yellow); transform-origin: bottom center; transition: transform .5s var(--ease); }
-    .burst i:nth-child(1) { transform: translateX(-50%) rotate(-55deg); }
-    .burst i:nth-child(2) { transform: translateX(-50%) rotate(-25deg); }
-    .burst i:nth-child(3) { transform: translateX(-50%) rotate(5deg); }
-    .the { position: relative; background: var(--yellow); color: var(--on-accent); font-weight: 700; letter-spacing: -.02em; padding: .14em .22em .1em; border-radius: .18em; }
-    .the::after { content: ''; position: absolute; right: .12em; bottom: -.28em; width: .32em; height: .32em; background: var(--yellow); clip-path: polygon(0 0, 100% 0, 100% 100%); }
-    .words { display: grid; gap: .16em; }
-    .create { font-weight: 700; letter-spacing: -.01em; color: #fff; }
-    .create .a { color: var(--yellow); }
-    .studio { font-family: var(--f-alt); font-weight: 600; font-size: .42em; letter-spacing: .55em; color: var(--yellow); }
-    .brand:hover .burst i:nth-child(1) { transform: translateX(-50%) rotate(-65deg) scaleY(1.2); }
-    .brand:hover .burst i:nth-child(3) { transform: translateX(-50%) rotate(15deg) scaleY(1.2); }
-    .brand--lg { --s: 3; }
-    @media (max-width: 600px) { .brand--lg { --s: 2; } }
+    :host { display: inline-block; line-height: 0; }
+    .logo { display: block; width: clamp(114px, 12vw, 152px); height: auto; overflow: visible; }
+    .logo--lg { width: min(440px, 72vw); }
+    .yellow { fill: var(--yellow); }
+    .teal { fill: var(--teal); }
+    .cream { fill: #fff; }
+    .studio { fill: none; stroke: var(--yellow); stroke-width: 4; }
+    .burst path, .play { transform-box: fill-box; transform-origin: 100% 100%; }
+    .burst path { animation: flick .7s var(--ease) 3 backwards; }
+    .burst path:nth-child(2) { animation-delay: .1s; }
+    .burst path:nth-child(3) { animation-delay: .2s; }
+    .play { transition: transform .4s var(--ease); }
+    :host(:hover) .burst path { animation: flick-hover .6s var(--ease) infinite alternate; }
+    :host(:hover) .play { transform: translateX(7px); }
+    @keyframes flick { 0% { transform: scale(.35); opacity: 0; } 60% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); } }
+    @keyframes flick-hover { to { transform: scale(1.22); } }
   `,
 })
 export class BrandComponent {

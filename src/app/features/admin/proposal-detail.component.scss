@@ -2,7 +2,7 @@
 .layout { display: grid; gap: 1.5rem; }
 @media (min-width: 1040px) { .layout { grid-template-columns: 1fr 340px; align-items: start; } }
 .main, .side { display: grid; gap: 1.25rem; }
-.step { display: grid; gap: 1rem; border-color: rgba(255, 224, 27, .3); }
+.step { display: grid; gap: 1rem; border-color: rgba(254,225,25, .3); }
 .step .btn { justify-self: start; }
 .link-row { display: flex; gap: .6rem; }
 .link-row .input { flex: 1; min-width: 0; }

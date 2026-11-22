@@ -7,7 +7,7 @@
 - **TypeScript** + **SCSS** design system (`src/styles.scss`)
 - **GSAP 3 + ScrollTrigger** for animations (every component cleans up its tweens and triggers on destroy)
 - **Web3Forms** for the contact form. There is no backend, SMTP or database.
-- Google Fonts: Space Grotesk, Inter, Manrope
+- Google Fonts: Bricolage Grotesque
 
 > Note: Angular 22 (the newest version) needs Node ≥ 24.15. This machine has Node 24.11.1, so the project uses Angular 21. To upgrade later, update Node and then run `ng update @angular/core@22 @angular/cli@22`.
 

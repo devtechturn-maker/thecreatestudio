@@ -22,7 +22,7 @@ import { MotionService } from '../core/services/motion.service';
   `,
   styles: `
     main { display: block; outline: none; min-height: 60vh; }
-    .curtain { position: fixed; inset: 0; z-index: 95; background: linear-gradient(120deg, #1a1028, #12112a); transform: scaleY(0); transform-origin: bottom; pointer-events: none; }
+    .curtain { position: fixed; inset: 0; z-index: 95; background: var(--yellow); transform: scaleY(0); transform-origin: bottom; pointer-events: none; }
   `,
 })
 export class MainLayoutComponent {

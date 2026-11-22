@@ -55,7 +55,7 @@ import { IconComponent } from '../../shared/components/icon.component';
     </section>
   `,
   styles: `
-    .share { display: grid; gap: 1rem; border-color: rgba(255, 224, 27, .3); }
+    .share { display: grid; gap: 1rem; border-color: rgba(254,225,25, .3); }
     .channels { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
     .ch { display: flex; gap: .8rem; align-items: center; text-align: left; padding: .9rem 1rem; border-radius: 14px; border: 1px solid var(--line-strong); background: var(--bg); transition: border-color .3s, transform .3s var(--ease); }
     .ch:hover { border-color: var(--yellow); transform: translateY(-2px); }

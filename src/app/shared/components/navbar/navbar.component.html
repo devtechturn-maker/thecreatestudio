@@ -29,7 +29,7 @@
       <li><a routerLink="/contact" routerLinkActive="is-active">Contact</a></li>
     </ul>
 
-    <a routerLink="/contact" class="btn btn--primary btn--sm nav__cta" appMagnetic>LET'S CREATE <app-icon name="arrow" [size]="16" /></a>
+    <a routerLink="/contact" class="btn btn--primary btn--sm nav__cta" appMagnetic>Let's talk</a>
 
     <button #burger type="button" class="burger" [class.is-open]="menuOpen()" (click)="toggleMenu()"
             [attr.aria-expanded]="menuOpen()" aria-controls="mobile-menu"
@@ -48,8 +48,8 @@
       <li class="m-line"><a data-m-item routerLink="/contact" routerLinkActive="is-active">Contact</a></li>
     </ul>
     <div class="mobile__foot container">
-      <a routerLink="/contact" class="btn btn--primary">LET'S CREATE <app-icon name="arrow" [size]="16" /></a>
-      <p class="muted">WE CREATE. YOU GROW.</p>
+      <a routerLink="/contact" class="btn btn--primary">Let's talk <app-icon name="arrow" [size]="16" /></a>
+      <p class="muted">We create. You grow.</p>
     </div>
   </div>
 </header>

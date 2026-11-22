@@ -26,7 +26,7 @@
 .sig__empty { color: #8a979a; font-style: italic; padding: 1.5rem 0; }
 
 .panel { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: clamp(1.5rem, 4vw, 2.5rem); display: grid; gap: 1.25rem; }
-.panel--pay { border-color: rgba(255, 224, 27, .35); }
+.panel--pay { border-color: rgba(254,225,25, .35); }
 .form { display: grid; gap: 1.4rem; }
 .label { font-family: var(--f-alt); font-weight: 600; font-size: .9rem; }
 .req { color: var(--yellow); }

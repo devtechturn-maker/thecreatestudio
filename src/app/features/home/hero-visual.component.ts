@@ -1,130 +1,120 @@
-import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, afterNextRender, inject } from '@angular/core';
-import { IconComponent } from '../../shared/components/icon.component';
-import { MotionService } from '../../core/services/motion.service';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 /**
- * Layered hero composition: website mockup, phone app mockup, social post,
- * growth chart & floating chips. Layers drift with the pointer (desktop).
+ * Animated hero illustration: browser, phone, SEO chip, search and chat badges.
+ * Every [data-pop] group is popped in by HomeComponent; the idle loops are plain CSS on inner
+ * groups, so the two never fight over the same transform.
  */
 @Component({
   selector: 'app-hero-visual',
-  imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div class="stage" aria-hidden="true">
-    <div class="orb" data-depth="0.2"></div>
+    <svg class="art" viewBox="33 312 640 418" aria-hidden="true" focusable="false">
+      <g data-pop><circle class="halo c-card" cx="360" cy="527" r="193" /></g>
 
-    <div class="browser layer" data-depth="0.35">
-      <div class="browser__bar"><i></i><i></i><i></i><span>yourbrand.com</span></div>
-      <div class="browser__body">
-        <div class="b-hero"><b></b><b class="s"></b><em></em></div>
-        <div class="b-cards"><span></span><span></span><span></span></div>
-      </div>
-    </div>
+      <g data-pop>
+        <rect class="c-deep outline" x="79" y="388" width="410" height="278" rx="28" />
+        <path class="outline" fill="none" d="M80 440h408" />
+        <circle class="dot c-coral" cx="112" cy="414" r="8.5" />
+        <circle class="dot c-yellow" cx="138" cy="414" r="8.5" />
+        <circle class="dot c-mint" cx="164" cy="414" r="8.5" />
+        <rect class="type c-cream" x="108" y="466" width="213" height="24" rx="12" />
+        <rect class="type type--2 c-ice" x="108" y="502" width="148" height="17" rx="8.5" />
+        <rect class="press c-yellow" x="108" y="535" width="105" height="36" rx="18" />
+        <rect class="tile c-card" x="108" y="590" width="102" height="56" rx="15" />
+        <rect class="tile c-card" x="223" y="590" width="101" height="56" rx="15" />
+        <rect class="tile c-card" x="337" y="590" width="119" height="56" rx="15" />
+      </g>
 
-    <div class="phone layer" data-depth="0.8">
-      <div class="phone__notch"></div>
-      <div class="phone__screen">
-        <div class="p-head"></div>
-        <div class="p-card"><span></span></div>
-        <div class="p-row"><i></i><i></i></div>
-        <div class="p-row"><i></i><i></i></div>
-        <div class="p-btn"></div>
-      </div>
-    </div>
+      <g data-pop>
+        <g class="beat">
+          <circle class="c-coral" cx="403" cy="516" r="49" />
+          <path class="trend white-line" pathLength="1" d="M380 530l18-18 12 10 19-19" />
+        </g>
+      </g>
 
-    <div class="post layer" data-depth="1.1">
-      <div class="post__head"><span class="post__av"></span><span class="post__name"></span></div>
-      <div class="post__img"><app-icon name="spark" [size]="34" /></div>
-      <div class="post__foot"><span>♥ Engagement</span><span class="up">▲</span></div>
-    </div>
+      <g data-pop>
+        <g class="bob bob--phone">
+          <rect class="c-deep phone" x="460" y="435" width="164" height="282" rx="34" />
+          <rect class="c-yellow" x="517" y="450" width="49" height="11" rx="5.5" />
+          <rect class="c-yellow" x="481" y="483" width="121" height="88" rx="20" />
+          <rect class="type c-ink" x="494" y="499" width="66" height="11" rx="5.5" />
+          <rect class="type type--2 c-cream" x="481" y="587" width="121" height="20" rx="10" />
+          <rect class="type type--3 c-ice" x="481" y="620" width="82" height="20" rx="10" />
+          <rect class="press press--late c-coral" x="481" y="656" width="121" height="36" rx="18" />
+        </g>
+      </g>
 
-    <div class="chart layer" data-depth="0.6">
-      <p>Growth</p>
-      <svg viewBox="0 0 160 70"><defs><linearGradient id="hv-g" x1="0" x2="1"><stop offset="0" stop-color="#ffe01b"/><stop offset="1" stop-color="#13808c"/></linearGradient></defs>
-        <path d="M0 62 C30 58 40 44 62 46 S100 22 120 24 S150 6 160 4" fill="none" stroke="url(#hv-g)" stroke-width="3" stroke-linecap="round"/></svg>
-    </div>
+      <g data-pop>
+        <g class="search">
+          <circle class="c-yellow" cx="131" cy="349" r="33" />
+          <circle class="ink-line" cx="126" cy="345" r="13" />
+          <path class="ink-line" d="M136 355l12 12" />
+        </g>
+      </g>
 
-    <span class="tag tag--1 layer" data-depth="1.3"><app-icon name="share" [size]="16" /> Social</span>
-    <span class="tag tag--2 layer" data-depth="1.0"><app-icon name="globe" [size]="16" /> Web</span>
-    <span class="tag tag--3 layer" data-depth="1.4"><app-icon name="phone" [size]="16" /> Apps</span>
-    <span class="tag tag--4 layer" data-depth="0.9"><app-icon name="pen" [size]="16" /> Design</span>
-  </div>`,
+      <g data-pop>
+        <g class="bob bob--seo">
+          <rect class="c-cream" x="524" y="329" width="128" height="55" rx="27.5" />
+          <path class="trend coral-line" pathLength="1" d="M546 367l19-15 10 9 16-18" />
+          <text class="seo" x="599" y="366">SEO</text>
+        </g>
+      </g>
+
+      <g data-pop>
+        <g class="bob bob--chat">
+          <path class="c-coral" d="M43 591h75q20 0 20 20v18q0 20-20 20H84l-21 20v-20H43z" />
+          <path class="trend white-line" pathLength="1" d="M66 621l11 11 19-19" />
+        </g>
+      </g>
+
+      <g data-pop><path class="star c-yellow" d="M363.5 631l4 10 11 .7-8.5 6.8 3 10.5-9.500-6-9.500 6 3-10.500-8.500-6.800 11-.700z" /></g>
+      <g data-pop><path class="diamond c-mint" d="M383 670l13 25-13 24-13-24z" /></g>
+    </svg>
+  `,
   styles: `
     :host { display: block; }
-    .stage { position: relative; width: 100%; max-width: 600px; margin-inline: auto; aspect-ratio: 1 / .92; }
-    .layer { position: absolute; will-change: transform; }
-    .orb { position: absolute; inset: 14%; border-radius: 50%; background: conic-gradient(from 120deg, #ffe01b, #13808c, #07191c 60%, #ffe01b); filter: blur(50px); opacity: .45; animation: spin 18s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .browser { left: 0; top: 10%; width: 74%; border-radius: 16px; background: #0f3036; border: 1px solid var(--line-strong); box-shadow: 0 40px 80px rgba(0,0,0,.5); overflow: hidden; }
-    .browser__bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
-    .browser__bar i { width: 9px; height: 9px; border-radius: 50%; background: #3f3f46; }
-    .browser__bar span { margin-left: 10px; font-size: 10px; color: var(--text-2); background: rgba(255,255,255,.05); padding: 3px 10px; border-radius: 99px; }
-    .browser__body { padding: 18px; display: grid; gap: 14px; }
-    .b-hero { height: 110px; border-radius: 12px; padding: 16px; background: linear-gradient(120deg, rgba(255,224,27,.35), rgba(19,128,140,.25)); display: grid; gap: 8px; align-content: center; }
-    .b-hero b { display: block; height: 12px; width: 70%; border-radius: 6px; background: rgba(255,255,255,.85); }
-    .b-hero b.s { width: 45%; background: rgba(255,255,255,.45); }
-    .b-hero em { display: block; width: 70px; height: 20px; border-radius: 99px; background: #fff; margin-top: 6px; }
-    .b-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .b-cards span { height: 64px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
-    .phone { right: 2%; top: 22%; width: 31%; aspect-ratio: 9/18.5; border-radius: 28px; background: #0c0c0e; border: 1px solid var(--line-strong); padding: 8px; box-shadow: 0 40px 70px rgba(0,0,0,.6); }
-    .phone__notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 34%; height: 12px; border-radius: 99px; background: #000; z-index: 1; }
-    .phone__screen { height: 100%; border-radius: 22px; background: #0f3036; padding: 30px 10px 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
-    .p-head { height: 10px; width: 60%; border-radius: 5px; background: rgba(255,255,255,.7); }
-    .p-card { height: 34%; border-radius: 14px; background: var(--grad); position: relative; }
-    .p-card span { position: absolute; left: 10px; bottom: 10px; width: 50%; height: 8px; border-radius: 4px; background: rgba(255,255,255,.8); }
-    .p-row { display: flex; gap: 6px; } .p-row i { flex: 1; height: 38px; border-radius: 10px; background: rgba(255,255,255,.07); }
-    .p-btn { margin-top: auto; height: 26px; border-radius: 99px; background: #fff; }
-    .post { left: 8%; bottom: 0; width: 38%; border-radius: 18px; background: #f7f7f5; color: #111; padding: 10px; box-shadow: 0 30px 60px rgba(0,0,0,.5); }
-    .post__head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .post__av { width: 22px; height: 22px; border-radius: 50%; background: var(--grad); }
-    .post__name { width: 50%; height: 8px; border-radius: 4px; background: #d4d4d8; }
-    .post__img { aspect-ratio: 1; border-radius: 12px; background: linear-gradient(135deg, #ffe01b, #13808c 60%, #07191c); display: grid; place-items: center; color: #fff; }
-    .post__foot { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-top: 8px; font-family: var(--f-alt); }
-    .post__foot .up { color: #16a34a; }
-    .chart { right: 0; bottom: 6%; width: 36%; border-radius: 16px; padding: 12px 14px; background: rgba(23,23,23,.85); backdrop-filter: blur(10px); border: 1px solid var(--line-strong); }
-    .chart p { font-size: 11px; color: var(--text-2); font-family: var(--f-alt); font-weight: 700; margin-bottom: 4px; }
-    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; font-family: var(--f-alt); background: rgba(23,23,23,.85); border: 1px solid var(--line-strong); backdrop-filter: blur(8px); white-space: nowrap; }
-    .tag app-icon { color: var(--purple); }
-    .tag--1 { left: 58%; top: 0; } .tag--2 { left: -2%; top: 2%; } .tag--3 { right: -2%; top: 76%; } .tag--4 { left: 40%; bottom: 26%; }
-    @media (max-width: 600px) { .tag { font-size: 10px; padding: 6px 10px; } .browser__body { padding: 10px; gap: 8px; } .b-hero { height: 70px; } .b-cards span { height: 36px; } }
+    .art { display: block; width: 100%; height: auto; overflow: visible; }
+    .art g, .art path, .art rect, .art circle { transform-box: fill-box; transform-origin: center; }
+    .c-card { fill: var(--teal-card); } .c-deep { fill: var(--teal-deep); } .c-cream { fill: var(--cream); }
+    .c-ice { fill: var(--ice); } .c-yellow { fill: var(--yellow); } .c-coral { fill: var(--coral); }
+    .c-mint { fill: var(--mint); } .c-ink { fill: var(--ink); }
+    .outline { stroke: var(--cream); stroke-width: 4.5; }
+    .phone { stroke: var(--yellow); stroke-width: 7; }
+    .white-line, .coral-line, .ink-line { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .white-line { stroke: #fff; stroke-width: 9; }
+    .coral-line { stroke: var(--coral); stroke-width: 8; }
+    .ink-line { stroke: var(--ink); stroke-width: 6.5; }
+    .seo { font: 600 20px var(--f-display); fill: var(--teal-deep); }
+
+    .halo { animation: breathe 7s ease-in-out infinite; }
+    .dot { animation: blink 2.4s ease-in-out infinite; }
+    .dot.c-yellow { animation-delay: .2s; } .dot.c-mint { animation-delay: .4s; }
+    .art .type { transform-origin: left center; animation: type 6s var(--ease) infinite; }
+    .type--2 { animation-delay: .35s !important; } .type--3 { animation-delay: .7s !important; }
+    .press { animation: press 3s ease-in-out infinite; }
+    .press--late { animation-delay: 1.5s; }
+    .tile { animation: tile 2.7s ease-in-out infinite; }
+    .tile:nth-of-type(6) { animation-delay: .3s; } .tile:nth-of-type(7) { animation-delay: .6s; }
+    .beat { animation: breathe 2.6s ease-in-out infinite; }
+    .trend { stroke-dasharray: 1 1; animation: draw 3.6s ease-in-out infinite; }
+    .bob { animation: bob 4s ease-in-out infinite; }
+    .bob--phone { animation-duration: 5s; }
+    .bob--seo { animation-delay: -1.3s; } .bob--chat { animation-delay: -2.4s; }
+    .search { animation: look 4.5s ease-in-out infinite; }
+    .star { animation: twinkle 4s ease-in-out infinite; }
+    .diamond { animation: flip 3.5s ease-in-out infinite; }
+
+    @keyframes breathe { 50% { transform: scale(1.07); } }
+    @keyframes blink { 50% { transform: scale(.65); } }
+    @keyframes type { 0% { transform: scaleX(0); } 18%, 100% { transform: scaleX(1); } }
+    @keyframes press { 12% { transform: scale(.88); } 24% { transform: scale(1); } }
+    @keyframes tile { 50% { opacity: .55; } }
+    @keyframes draw { 0% { stroke-dashoffset: 1; } 30%, 100% { stroke-dashoffset: 0; } }
+    @keyframes bob { 50% { transform: translateY(-10px); } }
+    @keyframes look { 25% { transform: translate(14px, 4px) rotate(8deg); } 65% { transform: translate(-4px, -8px) rotate(-10deg); } }
+    @keyframes twinkle { 50% { transform: rotate(145deg) scale(1.35); } }
+    @keyframes flip { 50% { transform: scaleX(.25) translateY(-5px); } }
   `,
 })
-export class HeroVisualComponent implements OnDestroy {
-  private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly motion = inject(MotionService);
-  private cleanup?: () => void;
-  private ctx?: gsap.Context;
-
-  constructor() {
-    afterNextRender(() => {
-      if (this.motion.reduced) return;
-      const root = this.host.nativeElement as HTMLElement;
-      const { gsap } = this.motion;
-      const layers = Array.from(root.querySelectorAll<HTMLElement>('.layer'));
-      this.ctx = gsap.context(() => {
-        // gentle idle float
-        layers.forEach((l, i) =>
-          gsap.to(l, { y: '+=' + (8 + (i % 3) * 4), duration: 3 + i * 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' }),
-        );
-      }, root);
-      if (!this.motion.finePointer) return;
-      const setters = layers.map((l) => ({
-        d: Number(l.dataset['depth'] ?? 0.5),
-        x: gsap.quickTo(l, 'x', { duration: 1, ease: 'power3.out' }),
-        r: gsap.quickTo(l, 'rotation', { duration: 1, ease: 'power3.out' }),
-      }));
-      const move = (e: PointerEvent) => {
-        const nx = e.clientX / window.innerWidth - 0.5;
-        setters.forEach((s) => { s.x(nx * 30 * s.d); s.r(nx * 2 * s.d); });
-      };
-      window.addEventListener('pointermove', move, { passive: true });
-      this.cleanup = () => window.removeEventListener('pointermove', move);
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.cleanup?.();
-    this.ctx?.revert();
-  }
-}
+export class HeroVisualComponent {}

@@ -1,5 +1,6 @@
 .contact { padding-top: 0; }
-.contact__grid { display: grid; gap: 3rem; }
+.contact__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 3rem; }
+.info-list li > div { min-width: 0; overflow-wrap: anywhere; }
 @media (min-width: 1000px) { .contact__grid { grid-template-columns: 1fr 1.6fr; align-items: start; } .contact__info { position: sticky; top: calc(var(--nav-h) + 2rem); } }
 .contact__info { display: grid; gap: 2rem; }
 .info-list { display: grid; gap: 1.25rem; }
@@ -10,13 +11,13 @@
 .info-steps ol { margin: 1rem 0 0; padding-left: 1.2rem; color: var(--text-2); display: grid; gap: .4rem; }
 .contact__form-wrap { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: clamp(1.5rem, 4vw, 3rem); }
 .config-note { margin-bottom: 1.5rem; code { color: #fff; } }
-.contact-form { display: grid; gap: 1.4rem; }
-.row { display: grid; gap: 1.4rem; }
+.contact-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
 @media (min-width: 700px) { .row { grid-template-columns: 1fr 1fr; } }
 .small { font-size: .82rem; }
 .req { color: var(--purple); }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
-fieldset.methods { border: 0; padding: 0; margin: 0; }
+fieldset.methods { min-width: 0; border: 0; padding: 0; margin: 0; }
 legend { font-family: var(--f-alt); font-weight: 600; font-size: .9rem; margin-bottom: .6rem; padding: 0; }
 .methods__opts { display: flex; flex-wrap: wrap; gap: .6rem; }
 .radio { position: relative; cursor: pointer; }
