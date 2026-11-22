@@ -49,7 +49,7 @@ export class PaymentsComponent {
         continue;
       }
       t.received += e.amountPaise;
-      if (e.method === 'ONLINE') t.online += e.amountPaise;
+      if (e.method === 'ONLINE' || e.method === 'UPI' || e.method === 'BANK_TRANSFER') t.online += e.amountPaise;
       else if (e.method === 'CASH') t.cash += e.amountPaise;
       else t.other += e.amountPaise;
       if (e.paidOn.startsWith(thisMonth)) t.month += e.amountPaise;

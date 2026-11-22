@@ -1,25 +1,25 @@
 # TheCreateStudio Backend (Java 21 · Spring Boot 4 · PostgreSQL)
 
 Proposals with **e-signatures from both parties**, **signed PDF agreements** with an audit
-certificate, and **Razorpay** advance payments. The Angular app (repo root) uses it at `/api`.
+certificate, and **manual payment tracking**. The Angular app (repo root) uses it at `/api`.
 
 ## What it does
 
 ```
 Admin creates proposal (DRAFT) ──► Admin signs ──► Send (content locked, email/link)
       ──► Client opens link (VIEWED) ──► Client accepts T&C + signs (SIGNED, sealed PDF)
-      ──► Client pays advance via Razorpay (PAID)  — or admin marks paid manually
+      ──► Admin records each payment received (PAID once the whole fee is in)
 ```
 
 - **Integrity:** when you sign, a SHA-256 fingerprint of the content is stored. The client can only
   sign if the content still matches. The final PDF includes both signatures, a Signature
   Certificate page (names, emails, times, IPs, device) and the full audit trail. Its SHA-256 hash is stored.
-- **Payments:** the amount always comes from the database, never from the browser. A payment is
-  only marked paid after Razorpay signature verification (checkout callback) or a verified webhook.
+- **Payments:** the admin records every payment by hand (cash, UPI, bank transfer, online, cheque, other)
+  and sets the amount due. The client sees the balance and history; there is no online checkout.
 - **Security:** admin APIs need a JWT (login with rate limiting, BCrypt passwords). Client pages are
   reached only through an unguessable 256-bit link; drafts and cancelled proposals return 404.
 - **No fake success:** without SMTP, emails are skipped and the admin is told to share the link.
-  Without Razorpay keys, the payment button explains that online payment isn't available.
+
 
 ## API overview
 
@@ -40,11 +40,9 @@ Admin creates proposal (DRAFT) ──► Admin signs ──► Send (content loc
 | PUT | `/api/admin/proposals/{id}/due` | admin: set the amount due now and its date |
 | POST | `/api/admin/proposals/{id}/payment-update` | admin: email the client a payment summary |
 | GET | `/api/public/proposals/{token}/account` | client: paid, balance, due and history |
-| GET | `/api/admin/integrations` | admin: whether email and Razorpay are configured |
+| GET | `/api/admin/integrations` | admin: whether email is configured |
 | GET | `/api/public/proposals/{token}` · `/pdf` | client |
 | POST | `/api/public/proposals/{token}/sign` | client |
-| GET/POST | `/api/public/proposals/{token}/payment/status` · `/order` · `/verify` | client |
-| POST | `/api/webhooks/razorpay` | Razorpay (HMAC-verified) |
 | GET | `/actuator/health` | health check |
 
 Errors use RFC 9457 problem JSON: `{ "detail": "message", "errors": { "field": "..." } }`.
@@ -72,17 +70,7 @@ Run tests: `mvnw.cmd test`. Flyway creates and upgrades the tables automatically
 ## Configuration (environment variables)
 
 See [`deploy/backend.env.example`](../deploy/backend.env.example): DB, `JWT_SECRET`, first
-`ADMIN_EMAIL`/`ADMIN_PASSWORD`, Razorpay keys and webhook secret, optional SMTP, and `APP_PUBLIC_BASE_URL`.
-
-## Razorpay setup
-
-1. Razorpay Dashboard → **Account & Settings → API Keys** → generate **Test** keys (`rzp_test_…`).
-2. Put them in `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` and restart.
-3. Dashboard → **Webhooks → Add**: URL `https://<your-domain>/api/webhooks/razorpay`, events
-   `payment.captured`, `order.paid`, `payment.failed`, and a secret → `RAZORPAY_WEBHOOK_SECRET`.
-   Razorpay requires a public HTTPS URL for webhooks, so set this up once you have a domain. Until
-   then, payments are still confirmed through the checkout signature check.
-4. Test a payment with Razorpay's test cards/UPI, then switch to **Live** keys after KYC.
+`ADMIN_EMAIL`/`ADMIN_PASSWORD`, optional SMTP, and `APP_PUBLIC_BASE_URL`.
 
 ## Production server setup (one time, in PuTTY as root)
 

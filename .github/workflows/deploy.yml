@@ -45,7 +45,7 @@ jobs:
             BACKEND=0
             if [ -n "$JAVA21" ] && [ -x "$JAVA21/bin/javac" ] && [ -f /etc/systemd/system/thecreatestudio-backend.service ]; then
               BACKEND=1
-              (cd backend && chmod +x mvnw && JAVA_HOME="$JAVA21" PATH="$JAVA21/bin:$PATH" ./mvnw -q -B package)
+              (cd backend && chmod +x mvnw && JAVA_HOME="$JAVA21" PATH="$JAVA21/bin:$PATH" ./mvnw -q -B clean package) # clean: deleted classes must not survive into the jar
             elif [ -f /etc/systemd/system/thecreatestudio-backend.service ]; then
               echo "Java 21 JDK not found. Run: apt install -y openjdk-21-jdk-headless"; exit 1
             else

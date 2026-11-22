@@ -9,8 +9,6 @@ interface PaymentEntryRepository extends JpaRepository<PaymentEntry, UUID> {
 
     List<PaymentEntry> findByProposalIdOrderByPaidOnDescCreatedAtDesc(UUID proposalId);
 
-    boolean existsByPaymentId(UUID paymentId);
-
     @Query("select coalesce(sum(e.amountPaise), 0) from PaymentEntry e where e.proposalId = :proposalId and e.voidedAt is null")
     long totalReceived(UUID proposalId);
 }

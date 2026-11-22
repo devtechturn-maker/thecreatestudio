@@ -63,7 +63,7 @@ class AdminLedgerController {
     @PostMapping("/proposals/{id}/payments")
     LedgerService.Account record(@PathVariable UUID id, @Valid @RequestBody RecordRequest body,
                                  @AuthenticationPrincipal Jwt jwt, HttpServletRequest req) {
-        ledger.recordOffline(id, body.id(), body.method(), body.amountPaise(), body.paidOn(), body.reference(), body.note(),
+        ledger.recordPayment(id, body.id(), body.method(), body.amountPaise(), body.paidOn(), body.reference(), body.note(),
                 jwt.getClaimAsString("email"), ClientInfo.from(req));
         return ledger.account(id);
     }

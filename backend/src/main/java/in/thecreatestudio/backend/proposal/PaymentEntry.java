@@ -35,9 +35,6 @@ public class PaymentEntry {
     @Column(name = "proposal_id", nullable = false)
     private UUID proposalId;
 
-    @Column(name = "payment_id", unique = true)
-    private UUID paymentId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Method method;
@@ -52,6 +49,7 @@ public class PaymentEntry {
 
     private String note;
 
+    // Only true on entries from the retired online checkout: not real money.
     @Column(name = "test_mode", nullable = false)
     private boolean testMode;
 
@@ -72,17 +70,15 @@ public class PaymentEntry {
 
     protected PaymentEntry() {}
 
-    PaymentEntry(UUID id, UUID proposalId, UUID paymentId, Method method, long amountPaise, LocalDate paidOn,
-                 String reference, String note, boolean testMode, String recordedBy) {
+    PaymentEntry(UUID id, UUID proposalId, Method method, long amountPaise, LocalDate paidOn,
+                 String reference, String note, String recordedBy) {
         this.id = id;
         this.proposalId = proposalId;
-        this.paymentId = paymentId;
         this.method = method;
         this.amountPaise = amountPaise;
         this.paidOn = paidOn;
         this.reference = reference;
         this.note = note;
-        this.testMode = testMode;
         this.recordedBy = recordedBy;
         this.createdAt = Instant.now();
     }
@@ -99,7 +95,6 @@ public class PaymentEntry {
 
     public UUID getId() { return id; }
     public UUID getProposalId() { return proposalId; }
-    public UUID getPaymentId() { return paymentId; }
     public Method getMethod() { return method; }
     public long getAmountPaise() { return amountPaise; }
     public LocalDate getPaidOn() { return paidOn; }

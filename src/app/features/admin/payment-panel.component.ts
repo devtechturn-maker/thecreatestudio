@@ -28,7 +28,7 @@ export class PaymentPanelComponent {
 
   protected readonly inr = formatINR;
   protected readonly labels = METHOD_LABELS;
-  protected readonly offlineMethods: PaymentMethod[] = ['CASH', 'UPI', 'BANK_TRANSFER', 'CHEQUE', 'OTHER'];
+  protected readonly methods: PaymentMethod[] = ['CASH', 'UPI', 'BANK_TRANSFER', 'ONLINE', 'CHEQUE', 'OTHER'];
   protected readonly today = todayIST();
   protected readonly account = signal<Account | null>(null);
   protected readonly mode = signal<Mode>(null);
@@ -62,8 +62,8 @@ export class PaymentPanelComponent {
       `Hi ${p.clientName.split(' ')[0]},`, '',
       `Payment update for "${p.title}" (${p.number}):`,
       `Total fee: ${formatINR(b.totalPaise)}`,
-      `Paid online: ${formatINR(b.onlinePaise)}`,
-      `Paid by cash / other: ${formatINR(b.offlinePaise)}`,
+      `Paid online / UPI / bank: ${formatINR(b.onlinePaise)}`,
+      `Paid by cash / cheque / other: ${formatINR(b.offlinePaise)}`,
       `Total received: ${formatINR(b.paidPaise)}`,
       `Balance: ${formatINR(b.balancePaise)}`,
     ];

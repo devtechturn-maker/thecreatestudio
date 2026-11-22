@@ -59,10 +59,10 @@ const DEFAULT_TERMS = `1. Scope: Work is limited to the deliverables listed in t
             <small>Full project price</small>
           </div>
           <div class="field">
-            <label for="advance">Advance (online)</label>
+            <label for="advance">Advance</label>
             <div class="input-affix"><span class="input-affix__sym" aria-hidden="true">₹</span>
               <input id="advance" type="number" inputmode="decimal" min="0" step="0.01" class="input" formControlName="advance" placeholder="0" /></div>
-            <small>Paid via Razorpay after signing · 0 = none</small>
+            <small>Due after signing · 0 = none</small>
           </div>
           <div class="field">
             <label for="validUntil">Valid until</label>

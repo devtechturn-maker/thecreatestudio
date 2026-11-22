@@ -102,18 +102,6 @@ export interface SendResponse {
   signingUrl: string;
 }
 
-export interface CheckoutOrder {
-  keyId: string;
-  orderId: string;
-  amount: number;
-  currency: string;
-  name: string;
-  description: string;
-  prefillName: string;
-  prefillEmail: string;
-  prefillContact: string | null;
-}
-
 export interface LoginResponse {
   token: string;
   expiresAt: string;

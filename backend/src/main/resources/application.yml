@@ -60,11 +60,6 @@ app:
     # On first start, an admin account is created from these values if none exists.
     email: ${ADMIN_EMAIL:}
     password: ${ADMIN_PASSWORD:}
-  razorpay:
-    key-id: ${RAZORPAY_KEY_ID:}
-    key-secret: ${RAZORPAY_KEY_SECRET:}
-    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:}
-    api-base: https://api.razorpay.com/v1
 
 management:
   endpoints:

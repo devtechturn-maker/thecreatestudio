@@ -11,7 +11,3 @@ app:
   admin:
     email: you@example.com
     password: a-strong-password
-  # razorpay:
-  #   key-id: rzp_test_xxxxx
-  #   key-secret: xxxxx
-  #   webhook-secret: xxxxx

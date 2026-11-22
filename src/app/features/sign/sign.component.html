@@ -112,15 +112,10 @@
             <app-payment-summary [balance]="a.balance" />
 
             @if (a.balance.dueNowPaise > 0) {
-              @if (paymentsEnabled() && a.balance.dueNowPaise >= 100) {
-                <p class="muted">Pay securely via Razorpay (UPI, cards, net banking, wallets). Cash payments will appear here once we record them.</p>
-                @if (payError()) { <p class="alert" role="alert">{{ payError() }}</p> }
-                <button type="button" class="btn btn--primary" (click)="pay()" [disabled]="paying()">
-                  @if (paying()) { <span class="spinner" aria-hidden="true"></span> Processing… } @else { Pay {{ inr(a.balance.dueNowPaise) }} online }
-                </button>
-              } @else {
-                <p class="muted">Online payment isn't available for this amount right now. Please contact us to pay by cash, UPI or bank transfer.</p>
-              }
+              <p class="muted">
+                Please <a class="contact-link" routerLink="/contact">contact us</a> to pay by cash, UPI, bank transfer or cheque.
+                Your payment will appear here once we receive and record it.
+              </p>
             } @else if (a.balance.balancePaise > 0 && p.status === 'SIGNED') {
               <p class="muted">Nothing to pay right now. We'll let you know when the next payment is due.</p>
             }
@@ -141,9 +136,6 @@
             </ul>
           </section>
         }
-      }
-      @if (justPaid()) {
-        <div class="banner banner--ok" role="status"><app-icon name="check" [size]="22" /><div><strong>Payment received. Thank you!</strong></div></div>
       }
     }
   </div>

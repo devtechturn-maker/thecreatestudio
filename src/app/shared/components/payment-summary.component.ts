@@ -18,7 +18,7 @@ import { Balance } from '../../core/api/ledger.api';
     <div class="track" role="progressbar" aria-label="Amount received" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent()">
       <span [style.width.%]="percent()"></span>
     </div>
-    <p class="split"><span>Online: <b>{{ inr(b.onlinePaise) }}</b></span><span>Cash &amp; other: <b>{{ inr(b.offlinePaise) }}</b></span></p>
+    <p class="split"><span>Online, UPI &amp; bank: <b>{{ inr(b.onlinePaise) }}</b></span><span>Cash, cheque &amp; other: <b>{{ inr(b.offlinePaise) }}</b></span></p>
     @if (b.dueNowPaise > 0) {
       <p class="due" [class.due--late]="b.overdue">
         <strong>Due now: {{ inr(b.dueNowPaise) }}</strong>

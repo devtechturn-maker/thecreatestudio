@@ -9,9 +9,9 @@
       <dt>Received</dt><dd>{{ inr(t.received) }}</dd>
       <small>{{ inr(t.month) }} this month</small>
     </div>
-    <div class="card-total"><dt>Online</dt><dd>{{ inr(t.online) }}</dd><small>Razorpay</small></div>
+    <div class="card-total"><dt>Online</dt><dd>{{ inr(t.online) }}</dd><small>UPI, bank &amp; online</small></div>
     <div class="card-total"><dt>Cash</dt><dd>{{ inr(t.cash) }}</dd></div>
-    <div class="card-total"><dt>UPI, bank &amp; other</dt><dd>{{ inr(t.other) }}</dd></div>
+    <div class="card-total"><dt>Cheque &amp; other</dt><dd>{{ inr(t.other) }}</dd></div>
     <div class="card-total"><dt>Total balance</dt><dd class="y">{{ inr(t.balance) }}</dd><small>On signed proposals</small></div>
     <div class="card-total" [class.card-total--late]="t.overdue > 0">
       <dt>Due now</dt><dd>{{ inr(t.due) }}</dd>
@@ -19,7 +19,7 @@
     </div>
   </dl>
   @if (t.test > 0) {
-    <p class="adm-note">{{ inr(t.test) }} of Razorpay test payments is not counted as received. Open those proposals and cancel the test entries so their balances are correct.</p>
+    <p class="adm-note">{{ inr(t.test) }} of old test payments is not counted as received. Open those proposals and cancel the test entries so their balances are correct.</p>
   }
 
   <div class="bar">

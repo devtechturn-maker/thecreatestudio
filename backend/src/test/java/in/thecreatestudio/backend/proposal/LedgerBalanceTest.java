@@ -23,7 +23,7 @@ class LedgerBalanceTest {
     }
 
     private static PaymentEntry entry(Proposal p, Method method, long amount) {
-        return new PaymentEntry(UUID.randomUUID(), p.getId(), null, method, amount, LocalDate.now(), null, null, false, "test");
+        return new PaymentEntry(UUID.randomUUID(), p.getId(), method, amount, LocalDate.now(), null, null, "test");
     }
 
     @Test
@@ -67,6 +67,15 @@ class LedgerBalanceTest {
         Proposal p = signed(50_000, 0);
         p.requestPayment(10_000, LocalDate.now().minusDays(3), null);
         assertTrue(LedgerService.balance(p, List.of()).overdue());
+    }
+
+    @Test
+    void upiAndBankCountAsOnlineChequeDoesNot() {
+        Proposal p = signed(50_000, 0);
+        var b = LedgerService.balance(p, List.of(entry(p, Method.UPI, 10_000), entry(p, Method.BANK_TRANSFER, 7_000),
+                entry(p, Method.CHEQUE, 3_000)));
+        assertEquals(17_000, b.onlinePaise());
+        assertEquals(3_000, b.offlinePaise());
     }
 
     @Test

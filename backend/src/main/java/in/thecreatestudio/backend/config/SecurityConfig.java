@@ -20,8 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Stateless JWT security.
- * Public:  /api/auth/login, /api/public/** (client signing & payment, gated by an
- *          unguessable token), /api/webhooks/** (Razorpay, verified by HMAC), health.
+ * Public:  /api/auth/login, /api/public/** (client signing and payment history, gated by an
+ *          unguessable token), health.
  * Admin:   everything else under /api requires a valid admin JWT.
  */
 @Configuration
@@ -36,7 +36,7 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers("/api/public/**", "/api/webhooks/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/actuator/health", "/error").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll())

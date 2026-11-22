@@ -5,7 +5,7 @@
     <app-payment-summary [balance]="a.balance" />
 
     @if (hasTest()) {
-      <p class="adm-note">Includes a Razorpay <strong>test</strong> payment. It is not real money. Cancel it below before tracking real payments.</p>
+      <p class="adm-note">Includes an old <strong>test</strong> payment. It is not real money. Cancel it below so the balance is correct.</p>
     }
 
     <div class="actions">
@@ -34,7 +34,7 @@
           <div class="field">
             <label for="rec-method">Paid by *</label>
             <select id="rec-method" class="input" formControlName="method">
-              @for (m of offlineMethods; track m) { <option [value]="m">{{ labels[m] }}</option> }
+              @for (m of methods; track m) { <option [value]="m">{{ labels[m] }}</option> }
             </select>
           </div>
           <div class="field">
@@ -115,9 +115,7 @@
             <div class="confirm">
               <label [for]="'reason-' + e.id">Why cancel it? (mistake, refund…)</label>
               <input [id]="'reason-' + e.id" class="input" maxlength="300" [formControl]="reason" />
-              @if (e.method === 'ONLINE') {
-                <small>This only updates your records. To return the money, refund it in the Razorpay dashboard.</small>
-              }
+              <small>This only updates your records. If you owe the client a refund, send it yourself.</small>
               <div class="actions">
                 <button type="button" class="btn btn--ghost btn--sm" (click)="confirmCancel(e.id)" [disabled]="busy()">Confirm cancel</button>
                 <button type="button" class="text-btn" (click)="cancelling.set(null)">Keep it</button>

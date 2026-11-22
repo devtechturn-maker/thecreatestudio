@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
-  AdminProposal, CheckoutOrder, ClientProposal, PageView, ProposalContent, ProposalStatus, ProposalSummary, SendResponse,
+  AdminProposal, ClientProposal, PageView, ProposalContent, ProposalStatus, ProposalSummary, SendResponse,
 } from './api.models';
 
 /** Admin proposal endpoints (JWT added by authInterceptor). */
@@ -55,8 +55,8 @@ export class AdminProposalsApi {
     return this.http.post<AdminProposal>(`${this.base}/${id}/share`, { channel });
   }
 
-  integrations(): Observable<{ emailConfigured: boolean; emailProblem: string | null; paymentsConfigured: boolean; publicBaseUrl: string }> {
-    return this.http.get<{ emailConfigured: boolean; emailProblem: string | null; paymentsConfigured: boolean; publicBaseUrl: string }>(
+  integrations(): Observable<{ emailConfigured: boolean; emailProblem: string | null; publicBaseUrl: string }> {
+    return this.http.get<{ emailConfigured: boolean; emailProblem: string | null; publicBaseUrl: string }>(
       `${environment.apiBase}/admin/integrations`,
     );
   }
@@ -82,17 +82,6 @@ export class PublicProposalsApi {
     return `${this.url(token)}/pdf`;
   }
 
-  paymentStatus(token: string): Observable<{ enabled: boolean }> {
-    return this.http.get<{ enabled: boolean }>(`${this.url(token)}/payment/status`);
-  }
-
-  createOrder(token: string): Observable<CheckoutOrder> {
-    return this.http.post<CheckoutOrder>(`${this.url(token)}/payment/order`, {});
-  }
-
-  verifyPayment(token: string, orderId: string, paymentId: string, signature: string): Observable<{ paid: boolean }> {
-    return this.http.post<{ paid: boolean }>(`${this.url(token)}/payment/verify`, { orderId, paymentId, signature });
-  }
 }
 
 /** Triggers a browser download for a Blob. */

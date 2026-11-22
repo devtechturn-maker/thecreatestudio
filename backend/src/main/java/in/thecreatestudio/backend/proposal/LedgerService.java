@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The single source of truth for money received and money due.
- * Every write locks the proposal row first, so a cash entry and an online payment arriving
- * together cannot both be counted against the same balance.
+ * All payments are entered by the admin. Every write locks the proposal row first, so two entries
+ * saved together cannot both be counted against the same balance.
  */
 @Service
 public class LedgerService {
@@ -73,7 +73,10 @@ public class LedgerService {
         for (PaymentEntry e : all) {
             if (!e.active()) continue;
             paid += e.getAmountPaise();
-            if (e.getMethod() == Method.ONLINE) online += e.getAmountPaise();
+            switch (e.getMethod()) {
+                case ONLINE, UPI, BANK_TRANSFER -> online += e.getAmountPaise();
+                case CASH, CHEQUE, OTHER -> { }
+            }
         }
         long due = p.dueNow(paid);
         return new Balance(p.getAmountPaise(), paid, online, paid - online, Math.max(p.getAmountPaise() - paid, 0),
@@ -86,7 +89,7 @@ public class LedgerService {
 
     /** @param entryId chosen by the browser, so a double tap or a retry records the money only once. */
     @Transactional
-    public void recordOffline(UUID id, UUID entryId, Method method, long amountPaise, LocalDate paidOn, String reference,
+    public void recordPayment(UUID id, UUID entryId, Method method, long amountPaise, LocalDate paidOn, String reference,
                               String note, String admin, ClientInfo info) {
         Proposal p = lock(id);
         PaymentEntry existing = entries.findById(entryId).orElse(null);
@@ -95,9 +98,6 @@ public class LedgerService {
                     && existing.getAmountPaise() == amountPaise && Objects.equals(existing.getPaidOn(), paidOn);
             if (sameRequest) return;
             throw ApiException.conflict("This payment was already recorded with different details. Reload and check the history.");
-        }
-        if (method == Method.ONLINE) {
-            throw ApiException.badRequest("Online payments are recorded automatically by Razorpay. Choose UPI or bank transfer for others.");
         }
         if (p.getStatus() == ProposalStatus.DRAFT || p.getStatus() == ProposalStatus.CANCELLED) {
             throw ApiException.conflict("Send the proposal before recording payments.");
@@ -109,7 +109,7 @@ public class LedgerService {
         if (amountPaise > balance) {
             throw ApiException.conflict("That is more than the balance of " + PdfService.formatMoney(balance, p.getCurrency()) + ".");
         }
-        entries.save(new PaymentEntry(entryId, id, null, method, amountPaise, paidOn, trim(reference), trim(note), false, admin));
+        entries.save(new PaymentEntry(entryId, id, method, amountPaise, paidOn, trim(reference), trim(note), admin));
         p.syncPaid(paid + amountPaise);
         proposalService.logEvent(id, "PAYMENT_RECORDED", Actor.ADMIN, info,
                 PdfService.formatMoney(amountPaise, p.getCurrency()) + " by " + method.label() + " on " + paidOn + " (" + admin + ")");
@@ -137,7 +137,6 @@ public class LedgerService {
         }
         long paid = entries.totalReceived(id);
         if (amountPaise > p.getAmountPaise() - paid) throw ApiException.badRequest("The amount due is more than the balance.");
-        if (amountPaise > 0 && amountPaise < 100) throw ApiException.badRequest("The smallest online payment is Rs. 1.");
         if (amountPaise > 0 && dueDate != null && dueDate.isBefore(today())) {
             throw ApiException.badRequest("The due date cannot be in the past.");
         }
@@ -146,43 +145,7 @@ public class LedgerService {
                 : PdfService.formatMoney(amountPaise, p.getCurrency()) + (dueDate == null ? "" : " due by " + dueDate));
     }
 
-    // ------------------------------------------------------------------ Razorpay hooks
-
-    @Transactional
-    public Proposal lockByToken(String token) {
-        Proposal p = proposals.findLockedByPublicToken(token).orElseThrow(() -> ApiException.notFound("Proposal"));
-        if (p.getStatus() == ProposalStatus.DRAFT || p.getStatus() == ProposalStatus.CANCELLED) throw ApiException.notFound("Proposal");
-        return p;
-    }
-
-    @Transactional(readOnly = true)
-    public long dueNow(Proposal p) {
-        return p.dueNow(entries.totalReceived(p.getId()));
-    }
-
-    /**
-     * Money Razorpay has already taken is always recorded, even if it overpays (for example cash
-     * was entered while the checkout was open). Overpayment is shown to the admin.
-     */
-    @Transactional
-    public void recordOnline(UUID id, UUID paymentId, long amountPaise, String razorpayPaymentId, boolean testMode) {
-        Proposal p = lock(id);
-        if (entries.existsByPaymentId(paymentId)) return;
-        entries.save(new PaymentEntry(UUID.randomUUID(), id, paymentId, Method.ONLINE, amountPaise, today(),
-                razorpayPaymentId, null, testMode, "Razorpay"));
-        p.syncPaid(entries.totalReceived(id));
-        proposalService.logEvent(id, "ONLINE_PAYMENT_RECEIVED", Actor.SYSTEM, null,
-                PdfService.formatMoney(amountPaise, p.getCurrency()) + " " + razorpayPaymentId + (testMode ? " (TEST)" : ""));
-    }
-
     // ------------------------------------------------------------------ client updates
-
-    /** Automatic receipt after an online payment. A mail failure never fails the payment. */
-    @Transactional
-    public void emailReceipt(UUID id) {
-        MailService.Result r = sendUpdate(id, true);
-        proposalService.logEvent(id, r.sent() ? "RECEIPT_EMAILED" : "RECEIPT_NOT_EMAILED", Actor.SYSTEM, null, r.error());
-    }
 
     @Transactional(noRollbackFor = ApiException.class)
     public void emailUpdate(UUID id, ClientInfo info) {
@@ -190,12 +153,12 @@ public class LedgerService {
         if (status == ProposalStatus.DRAFT || status == ProposalStatus.CANCELLED) {
             throw ApiException.conflict("Send the proposal before emailing a payment update.");
         }
-        MailService.Result r = sendUpdate(id, false);
+        MailService.Result r = sendUpdate(id);
         proposalService.logEvent(id, "PAYMENT_UPDATE_EMAIL", Actor.ADMIN, info, r.sent() ? "Sent" : "Failed: " + r.error());
         if (!r.sent()) throw new ApiException(HttpStatus.BAD_GATEWAY, r.error());
     }
 
-    private MailService.Result sendUpdate(UUID id, boolean copyOwner) {
+    private MailService.Result sendUpdate(UUID id) {
         Proposal p = proposalService.get(id);
         List<PaymentEntry> all = entries.findByProposalIdOrderByPaidOnDescCreatedAtDesc(id);
         Balance b = balance(p, all);
@@ -205,8 +168,8 @@ public class LedgerService {
                 + "\" (" + p.getNumber() + "):\n");
         StringBuilder rows = new StringBuilder();
         line(text, rows, "Total fee", PdfService.formatMoney(b.totalPaise(), p.getCurrency()));
-        line(text, rows, "Paid online", PdfService.formatMoney(b.onlinePaise(), p.getCurrency()));
-        line(text, rows, "Paid by cash or other ways", PdfService.formatMoney(b.offlinePaise(), p.getCurrency()));
+        line(text, rows, "Paid online, UPI or bank", PdfService.formatMoney(b.onlinePaise(), p.getCurrency()));
+        line(text, rows, "Paid by cash, cheque or other", PdfService.formatMoney(b.offlinePaise(), p.getCurrency()));
         line(text, rows, "Total received", PdfService.formatMoney(b.paidPaise(), p.getCurrency()));
         line(text, rows, "Balance", PdfService.formatMoney(b.balancePaise(), p.getCurrency()));
         if (b.dueNowPaise() > 0) {
@@ -219,9 +182,7 @@ public class LedgerService {
         }
         text.append("\nFull payment history: ").append(url);
 
-        List<String> to = copyOwner && !mail.fromAddress().isBlank()
-                ? List.of(p.getClientEmail(), mail.fromAddress()) : List.of(p.getClientEmail());
-        return mail.send(to, "Payment update: " + p.getTitle() + " (" + p.getNumber() + ")", text.toString(),
+        return mail.send(List.of(p.getClientEmail()), "Payment update: " + p.getTitle() + " (" + p.getNumber() + ")", text.toString(),
                 mail.layout("Payment update", "<p>Hi " + MailService.esc(p.getClientName()) + ", here is the payment summary for <b>"
                         + MailService.esc(p.getTitle()) + "</b>.</p><table cellpadding=\"6\">" + rows + "</table>",
                         "View payments", url), null);
