@@ -1,0 +1,82 @@
+<div class="anchor" (keydown.escape)="onEscape($event)">
+  <button
+    #trigger
+    type="button"
+    class="trigger"
+    role="combobox"
+    aria-haspopup="listbox"
+    [id]="controlId()"
+    [class.is-invalid]="invalid()"
+    [class.is-empty]="!selected().length"
+    [disabled]="disabled()"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="controlId() + '-list'"
+    [attr.aria-labelledby]="labelId() + ' ' + controlId() + '-value'"
+    [attr.aria-activedescendant]="open() ? controlId() + '-option-' + active() : null"
+    [attr.aria-invalid]="invalid()"
+    [attr.aria-describedby]="invalid() ? errorId() : null"
+    aria-required="true"
+    (mousedown)="$event.preventDefault()"
+    (click)="toggle()"
+    (keydown)="onKey($event)"
+  >
+    <span class="value" [id]="controlId() + '-value'">{{ summary() }}</span>
+    @if (multiple() && selected().length) {
+      <span class="count" aria-hidden="true">{{ selected().length }}</span>
+    }
+    <app-icon class="chevron" name="chevron" [size]="18" />
+  </button>
+
+  <div class="panel" [hidden]="!open()">
+    @if (multiple()) {
+      <div class="head" aria-hidden="true" (mousedown)="$event.preventDefault()">
+        <span>Choose one or more</span>
+        <b>{{ selected().length }} of {{ options().length }}</b>
+      </div>
+    }
+
+    <ul class="list" role="listbox" tabindex="-1" [id]="controlId() + '-list'" [attr.aria-labelledby]="labelId()" [attr.aria-multiselectable]="multiple()">
+      @for (option of options(); track option; let i = $index) {
+        <li
+          class="option"
+          role="option"
+          [id]="controlId() + '-option-' + i"
+          [attr.aria-selected]="selected().includes(option)"
+          [class.is-active]="active() === i"
+          [class.is-selected]="selected().includes(option)"
+          (mousedown)="$event.preventDefault()"
+          (mousemove)="active.set(i)"
+          (click)="active.set(i); pick(option)"
+        >
+          <span class="mark" [class.mark--round]="!multiple()" aria-hidden="true"><app-icon name="check" [size]="14" /></span>
+          <span class="option__text">{{ option }}</span>
+        </li>
+      }
+    </ul>
+
+    @if (multiple()) {
+      <div class="foot" (mousedown)="$event.preventDefault()">
+        <button type="button" class="clear" [disabled]="!selected().length" (click)="clear()">Clear all</button>
+        <button type="button" class="done" (click)="done()">
+          Done@if (selected().length) { ({{ selected().length }}) }
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+@if (multiple()) {
+  <span class="sr-only" aria-live="polite">{{ countText() }}</span>
+  @if (selected().length) {
+    <ul class="chips-list" aria-label="Selected">
+      @for (option of selected(); track option) {
+        <li class="picked">
+          <span>{{ option }}</span>
+          <button type="button" class="picked__remove" [disabled]="disabled()" [attr.aria-label]="'Remove ' + option" (click)="remove(option)">
+            <app-icon name="close" [size]="13" />
+          </button>
+        </li>
+      }
+    </ul>
+  }
+}

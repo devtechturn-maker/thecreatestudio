@@ -173,4 +173,7 @@ export const CONTACT_SERVICES = [
   'Mobile App Development', 'UI/UX Design', 'Complete Digital Marketing', 'Other',
 ];
 
+/** Choosing any of these asks the client for their social media accounts. */
+export const SOCIAL_SERVICES = ['Social Media Management', 'Reels & Video Editing', 'Meta Ads', 'Complete Digital Marketing'];
+
 export const BUDGETS = ['Under ₹10,000', '₹10,000 – ₹25,000', '₹25,000 – ₹50,000', '₹50,000 – ₹1,00,000', '₹1,00,000+'];

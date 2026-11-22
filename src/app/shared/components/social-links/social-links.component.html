@@ -1,0 +1,41 @@
+@for (row of rows(); track $index; let i = $index, last = $last) {
+  <div class="row">
+    <div class="box">
+      <input
+        #box
+        class="input"
+        type="text"
+        maxlength="300"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        [value]="row.value"
+        [disabled]="disabled()"
+        [class.has-delete]="row.value || rows().length > 1"
+        [class.is-invalid]="invalid() && row.bad"
+        [attr.aria-label]="'Social media link ' + (i + 1) + '. Type new if you have no account'"
+        [attr.aria-invalid]="invalid() && row.bad"
+        [attr.aria-describedby]="describedBy()"
+        (input)="edit(i, box.value)"
+        (keydown.enter)="add($event)"
+      />
+      <span class="platform" [attr.data-platform]="row.platform?.id" [title]="row.platform?.name ?? ''" aria-hidden="true">
+        <app-icon [name]="row.platform?.icon ?? 'share'" [size]="19" />
+      </span>
+      @if (!row.value) {
+        <!-- Not a native placeholder: this one can wrap, so "new" is never cut off on phones -->
+        <span class="hint" aria-hidden="true">Paste link, or type <b>new</b> if you don't have an account</span>
+      }
+      @if (row.value || rows().length > 1) {
+        <button type="button" class="delete" [disabled]="disabled()" [attr.aria-label]="'Delete link ' + (i + 1)" title="Delete link" (click)="remove(i)">
+          <app-icon name="trash" [size]="18" />
+        </button>
+      }
+    </div>
+    @if (last && !full()) {
+      <button type="button" class="add" [disabled]="disabled()" aria-label="Add another link" title="Add another link" (click)="add($event)">
+        <app-icon name="plus" [size]="22" />
+      </button>
+    }
+  </div>
+}

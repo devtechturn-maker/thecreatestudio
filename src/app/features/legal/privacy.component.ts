@@ -20,7 +20,7 @@ import { RevealDirective } from '../../shared/directives/reveal.directive';
       <h2>1. Who we are</h2>
       <p>This website is operated by TheCreateStudio, a digital marketing and website/app development agency.</p>
       <h2>2. Information we collect</h2>
-      <p>When you submit our contact form we collect the details you provide: your name, company name, email address, phone number, the service you are interested in, your budget range, your project description and your preferred contact method.</p>
+      <p>When you submit our contact form we collect the details you provide: your name, company name, email address, phone number, the services you are interested in, any social media profile links, your budget range, your project description and your preferred contact method.</p>
       <h2>3. How we use your information</h2>
       <ul>
         <li>To respond to your inquiry and discuss your project.</li>

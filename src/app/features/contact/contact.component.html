@@ -95,24 +95,46 @@
 
           <div class="row">
             <div class="field">
-              <label for="service">Service Required <span class="req">*</span></label>
-              <select id="service" class="input" formControlName="service_required" [class.is-invalid]="invalid('service_required')"
-                      [attr.aria-invalid]="invalid('service_required')" aria-describedby="service-err">
-                <option value="" disabled>Select a service</option>
-                @for (s of services; track s) { <option [value]="s">{{ s }}</option> }
-              </select>
-              @if (invalid('service_required')) { <span id="service-err" class="error-msg" role="alert">Please select a service.</span> }
+              <span id="service-label" class="dd-label" (click)="serviceDropdown.focus()">Services Required <span class="req">*</span></span>
+              <app-dropdown
+                #serviceDropdown
+                controlId="service"
+                labelId="service-label"
+                errorId="service-err"
+                formControlName="service_required"
+                placeholder="Select services"
+                noun="services"
+                nounOne="service"
+                [multiple]="true"
+                [options]="services"
+                [invalid]="invalid('service_required')"
+              />
+              @if (invalid('service_required')) { <span id="service-err" class="error-msg" role="alert">Please select at least one service.</span> }
             </div>
             <div class="field">
-              <label for="budget">Project Budget <span class="req">*</span></label>
-              <select id="budget" class="input" formControlName="project_budget" [class.is-invalid]="invalid('project_budget')"
-                      [attr.aria-invalid]="invalid('project_budget')" aria-describedby="budget-err">
-                <option value="" disabled>Select a budget range</option>
-                @for (b of budgets; track b) { <option [value]="b">{{ b }}</option> }
-              </select>
+              <span id="budget-label" class="dd-label" (click)="budgetDropdown.focus()">Project Budget <span class="req">*</span></span>
+              <app-dropdown
+                #budgetDropdown
+                controlId="budget"
+                labelId="budget-label"
+                errorId="budget-err"
+                formControlName="project_budget"
+                placeholder="Select a budget range"
+                [options]="budgets"
+                [invalid]="invalid('project_budget')"
+              />
               @if (invalid('project_budget')) { <span id="budget-err" class="error-msg" role="alert">Please select a budget range.</span> }
             </div>
           </div>
+
+          @if (needsSocial()) {
+            <div class="field" role="group" aria-labelledby="social-label">
+              <span id="social-label" class="dd-label">Social Media Links <span class="req">*</span></span>
+              <app-social-links formControlName="social_links" [invalid]="invalid('social_links')" describedBy="social-help social-err" />
+              <small id="social-help">Add your Instagram, Facebook or other profile links so we can check them and plan your budget. Use + to add more.</small>
+              @if (invalid('social_links')) { <span id="social-err" class="error-msg" role="alert">Paste a valid profile link or &#64;username, or type "new" if you don't have an account.</span> }
+            </div>
+          }
 
           <div class="field">
             <label for="message">Project Description <span class="req">*</span></label>

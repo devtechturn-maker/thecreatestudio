@@ -45,7 +45,7 @@ export class CursorComponent implements OnDestroy {
     const over = (e: Event) => {
       const t = e.target as HTMLElement;
       html.classList.toggle('cursor-view', !!t.closest('[data-cursor="view"]'));
-      html.classList.toggle('cursor-hover', !!t.closest('a, button, input, select, textarea, [role="button"]'));
+      html.classList.toggle('cursor-hover', !!t.closest('a, button, input, select, textarea, [role="button"], [role="option"]'));
     };
     this.doc.addEventListener('pointermove', move, { passive: true });
     this.doc.addEventListener('pointerover', over, { passive: true });

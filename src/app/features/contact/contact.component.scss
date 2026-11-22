@@ -16,6 +16,7 @@
 @media (min-width: 700px) { .row { grid-template-columns: 1fr 1fr; } }
 .small { font-size: .82rem; }
 .req { color: var(--purple); }
+.dd-label { justify-self: start; font-family: var(--f-alt); font-weight: 600; font-size: .9rem; }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 fieldset.methods { min-width: 0; border: 0; padding: 0; margin: 0; }
 legend { font-family: var(--f-alt); font-weight: 600; font-size: .9rem; margin-bottom: .6rem; padding: 0; }

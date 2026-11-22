@@ -197,6 +197,14 @@ select.input option { background: var(--bg-2); }
 .input-affix { position: relative; display: flex; align-items: center; }
 .input-affix__sym { position: absolute; left: 1rem; color: var(--yellow); font-family: var(--f-alt); font-weight: 800; pointer-events: none; }
 .input-affix .input { padding-left: 2.25rem; font-variant-numeric: tabular-nums; }
+/* Keep browser autofill in the site's colours */
+.input:-webkit-autofill, .input:-webkit-autofill:hover, .input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text); caret-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+}
+.input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 1000px var(--bg) inset, 0 0 0 4px rgba(254, 225, 25, .18); }
+/* An open dropdown's Done button must not sit under the floating buttons */
+body:has(app-dropdown.is-open) app-floating-actions { visibility: hidden; }
 .input::placeholder { color: var(--ice); opacity: .75; }
 textarea.input { min-height: 160px; resize: vertical; }
 .error-msg { color: #fca5a5; font-size: .84rem; }

@@ -9,6 +9,8 @@ export interface InquiryPayload {
   email: string;
   phone: string;
   service_required: string;
+  /** Empty unless a social media service was selected. */
+  social_media_accounts: string;
   project_budget: string;
   message: string;
   preferred_contact_method: string;
@@ -46,6 +48,7 @@ export class Web3FormsService {
       company: p.company || '—',
       phone: p.phone,
       service_required: p.service_required,
+      ...(p.social_media_accounts && { social_media_accounts: p.social_media_accounts }),
       project_budget: p.project_budget,
       preferred_contact_method: p.preferred_contact_method,
       message: p.message,
