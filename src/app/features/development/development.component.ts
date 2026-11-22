@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, afterRenderEffect, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -7,6 +7,7 @@ import { CtaSectionComponent } from '../../shared/components/cta-section.compone
 import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { MagneticDirective } from '../../shared/directives/magnetic.directive';
 import { ParallaxDirective } from '../../shared/directives/parallax.directive';
+import { MotionService } from '../../core/services/motion.service';
 import { DEV_PROCESS, DEV_SERVICES, TECH_STACK } from '../../core/config/services.data';
 
 const CONTACT_MAP: Record<string, string> = {
@@ -154,7 +155,8 @@ const CONTACT_MAP: Record<string, string> = {
     .code__bar span { margin-left: 8px; font-size: .75rem; color: var(--text-2); }
     pre { margin: 0; padding: 1.5rem; font-size: clamp(.78rem, 1.4vw, .95rem); line-height: 1.8; overflow-x: auto; color: var(--cream); }
     .k { color: #ffe01b; } .t { color: #5eead4; } .s { color: #86efac; } .f { color: #fcd34d; }
-    .tabs { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; margin-bottom: 3rem; scrollbar-width: none; }
+    .tabs { display: flex; flex-wrap: wrap; gap: .5rem; padding-bottom: .5rem; margin-bottom: 3rem; }
+    @media (max-width: 599px) { .tabs { display: grid; } .tabs button { width: 100%; text-align: left; } }
     .tabs button { flex: none; display: inline-flex; align-items: center; gap: .55rem; padding: .9rem 1.3rem; border-radius: 999px; border: 1px solid var(--line-strong); font-family: var(--f-alt); font-weight: 700; font-size: .92rem; color: var(--text-2); transition: all .35s var(--ease); }
     .tabs button:hover { color: #fff; }
     .tabs button.is-active { background: var(--grad); color: var(--on-accent); border-color: transparent; }
@@ -180,8 +182,8 @@ const CONTACT_MAP: Record<string, string> = {
     @media (min-width: 900px) { .stack__group { grid-template-columns: 220px 1fr; align-items: center; } }
     .stack__label { font-family: var(--f-display); font-size: 1.6rem; letter-spacing: -.03em; }
     .stack__items { display: flex; flex-wrap: wrap; gap: .75rem; }
-    .badge { display: inline-flex; align-items: center; gap: .6rem; padding: .8rem 1.25rem; border-radius: 14px; background: var(--bg); border: 1px solid var(--line-strong); font-family: var(--f-alt); font-weight: 700; transition: all .35s var(--ease); }
-    .badge:hover { border-color: var(--purple); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(254,225,25,.2); }
+    .badge { display: inline-flex; align-items: center; gap: .6rem; padding: .8rem 1.25rem; border-radius: 14px; background: var(--bg); border: 1px solid var(--line-strong); font-family: var(--f-alt); font-weight: 700; transition: border-color .35s var(--ease), box-shadow .35s var(--ease); }
+    .badge:hover { border-color: var(--purple); box-shadow: 0 12px 30px rgba(254,225,25,.2); }
     .badge__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--grad); }
     .proc { display: grid; gap: 2rem; }
     @media (min-width: 900px) { .proc { grid-template-columns: 1fr 1.1fr; align-items: stretch; } }
@@ -205,6 +207,12 @@ export class DevelopmentComponent {
   protected readonly step = signal(0);
 
   constructor() {
+    const motion = inject(MotionService);
+    // Tabs differ in height, so the scroll animations below need new trigger positions.
+    afterRenderEffect(() => {
+      this.tab();
+      motion.refresh();
+    });
     // Support deep links like /development#mobile
     inject(ActivatedRoute).fragment.pipe(takeUntilDestroyed()).subscribe((hash) => {
       const idx = DEV_SERVICES.findIndex((g) => g.id === hash);
