@@ -31,7 +31,7 @@ Admin creates proposal (DRAFT) ──► Admin signs ──► Send (content loc
 | GET/PUT | `/api/admin/proposals/{id}` | admin: view / edit (DRAFT only) |
 | POST | `/api/admin/proposals/{id}/sign` · `/send` · `/cancel` · `/mark-paid` | admin |
 | GET | `/api/admin/proposals/{id}/pdf` | admin |
-| POST | `/api/admin/proposals/{id}/resend-email` | admin: email the link again (needs SMTP) |
+| POST | `/api/admin/proposals/{id}/resend-email` | admin: email the signing link again, or the signed PDF once signed (needs SMTP) |
 | POST | `/api/admin/proposals/{id}/share` | admin: log a WhatsApp / email-app / copy share in the audit trail |
 | GET | `/api/admin/integrations` | admin: whether email and Razorpay are configured |
 | GET | `/api/public/proposals/{token}` · `/pdf` | client |

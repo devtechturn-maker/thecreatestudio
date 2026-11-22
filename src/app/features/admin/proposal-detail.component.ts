@@ -29,6 +29,7 @@ export class ProposalDetailComponent {
   protected readonly signature = signal<string | null>(null);
   protected readonly paidNote = signal('');
   protected readonly emailConfigured = signal(false);
+  protected readonly emailProblem = signal('');
   protected readonly inr = formatINR;
 
   protected readonly isDraft = computed(() => this.p()?.status === 'DRAFT');
@@ -36,7 +37,7 @@ export class ProposalDetailComponent {
 
   constructor() {
     effect(() => this.load(this.id()));
-    this.api.integrations().subscribe({ next: (s) => this.emailConfigured.set(s.emailConfigured), error: () => {} });
+    this.api.integrations().subscribe({ next: (s) => { this.emailConfigured.set(s.emailConfigured); this.emailProblem.set(s.emailProblem ?? ''); }, error: (e) => this.emailProblem.set(apiError(e)) });
   }
 
   load(id: string): void {
@@ -68,7 +69,7 @@ export class ProposalDetailComponent {
         this.p.set(r.proposal);
         this.notice.set(r.emailSent
           ? `Emailed to ${r.proposal.clientEmail}.`
-          : "Marked as sent. Website email isn't set up, so share it with the client using WhatsApp or your email app below.");
+          : `Marked as sent, but the email was not sent. ${r.emailError ?? ''} You can share the link below instead.`);
         this.busy.set(false);
       },
       error: (e) => { this.error.set(apiError(e)); this.busy.set(false); },

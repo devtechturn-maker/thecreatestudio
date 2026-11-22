@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProposalService {
 
-    public record SendResult(Proposal proposal, boolean emailSent, String signingUrl) {}
+    public record SendResult(Proposal proposal, boolean emailSent, String emailError, String signingUrl) {}
 
     private final ProposalRepository proposals;
     private final ProposalEventRepository events;
@@ -85,25 +85,30 @@ public class ProposalService {
         Proposal p = get(id);
         p.markSent();
         String url = signingUrl(p);
-        boolean sent = emailProposal(p);
-        log(p, "SENT", Actor.ADMIN, info, sent ? "Emailed to " + p.getClientEmail() : "Email not sent — share the link manually");
-        return new SendResult(p, sent, url);
+        MailService.Result mailed = emailProposal(p);
+        log(p, "SENT", Actor.ADMIN, info, mailed.sent() ? "Emailed to " + p.getClientEmail() : "Email not sent: " + mailed.error());
+        return new SendResult(p, mailed.sent(), mailed.error(), url);
     }
 
-    /** Re-sends the signing email (e.g. client lost it). Only while awaiting the client's signature. */
-    @Transactional
+    /**
+     * Emails the client again: the signing link while waiting, or the signed PDF afterwards.
+     * noRollbackFor keeps the failed attempt in the audit trail.
+     */
+    @Transactional(noRollbackFor = ApiException.class)
     public boolean resendEmail(UUID id, ClientInfo info) {
         Proposal p = get(id);
-        if (p.getStatus() != ProposalStatus.SENT && p.getStatus() != ProposalStatus.VIEWED) {
-            throw ApiException.conflict("Only proposals waiting for the client's signature can be emailed again.");
+        boolean signed = p.getStatus() == ProposalStatus.SIGNED || p.getStatus() == ProposalStatus.PAID;
+        if (!signed && p.getStatus() != ProposalStatus.SENT && p.getStatus() != ProposalStatus.VIEWED) {
+            throw ApiException.conflict("Send the proposal before emailing it.");
         }
-        if (!mail.isConfigured()) {
-            throw new ApiException(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
-                    "Email is not configured on the server. Use WhatsApp, your email app, or copy the link instead.");
+        String problem = mail.configurationProblem();
+        if (problem != null) {
+            throw new ApiException(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "Email is not set up: " + problem);
         }
-        boolean sent = emailProposal(p);
-        log(p, "EMAIL_RESENT", Actor.ADMIN, info, sent ? "Emailed again to " + p.getClientEmail() : "Email sending failed");
-        if (!sent) throw new ApiException(org.springframework.http.HttpStatus.BAD_GATEWAY, "The email could not be sent. Please try again later.");
+        MailService.Result mailed = signed ? emailSignedAgreement(p, List.of(p.getClientEmail())) : emailProposal(p);
+        log(p, "EMAIL_RESENT", Actor.ADMIN, info,
+                mailed.sent() ? "Emailed again to " + p.getClientEmail() : "Email failed: " + mailed.error());
+        if (!mailed.sent()) throw new ApiException(org.springframework.http.HttpStatus.BAD_GATEWAY, mailed.error());
         return true;
     }
 
@@ -123,17 +128,34 @@ public class ProposalService {
         log(p, "LINK_SHARED", Actor.ADMIN, info, label);
     }
 
-    public boolean mailConfigured() {
-        return mail.isConfigured();
+    public String mailProblem() {
+        return mail.configurationProblem();
     }
 
-    private boolean emailProposal(Proposal p) {
+    private MailService.Result emailProposal(Proposal p) {
+        String url = signingUrl(p);
         String body = "<p>Hi " + MailService.esc(p.getClientName()) + ",</p>"
                 + "<p>Thank you for the opportunity. Your proposal <b>" + MailService.esc(p.getTitle()) + "</b> ("
                 + p.getNumber() + ") is ready for your review.</p>"
                 + "<p>You can read the full scope and terms, download a PDF, and accept and sign online.</p>";
+        String text = "Hi " + p.getClientName() + ",\n\nYour proposal \"" + p.getTitle() + "\" (" + p.getNumber()
+                + ") is ready. Review and sign it here:\n" + url + "\n\n" + props.companyName();
         return mail.send(List.of(p.getClientEmail()), "Your proposal from " + props.companyName() + " — " + p.getTitle(),
-                mail.layout("Your proposal is ready", body, "Review & Sign Proposal", signingUrl(p)), null);
+                text, mail.layout("Your proposal is ready", body, "Review & Sign Proposal", url), null);
+    }
+
+    private MailService.Result emailSignedAgreement(Proposal p, List<String> to) {
+        String url = signingUrl(p);
+        String body = "<p>Hi " + MailService.esc(p.getClientName()) + ",</p>"
+                + "<p>Thank you! <b>" + MailService.esc(p.getTitle()) + "</b> (" + p.getNumber()
+                + ") has been signed by both parties. A copy of the signed agreement is attached.</p>"
+                + (p.paymentDue() ? "<p>You can pay the advance online from the same link.</p>" : "");
+        String text = "Hi " + p.getClientName() + ",\n\n\"" + p.getTitle() + "\" (" + p.getNumber()
+                + ") has been signed by both parties. The signed agreement is attached. You can also view it here:\n"
+                + url + "\n\n" + props.companyName();
+        return mail.send(to, "Signed: " + p.getTitle() + " (" + p.getNumber() + ")",
+                text, mail.layout("Agreement signed", body, "View agreement", url),
+                new MailService.Attachment(p.getNumber() + "-signed.pdf", p.getSignedPdf(), "application/pdf"));
     }
 
     @Transactional
@@ -183,15 +205,11 @@ public class ProposalService {
         p.attachSignedPdf(finalPdf);
         log(p, "AGREEMENT_SEALED", Actor.SYSTEM, null, "Signed PDF SHA-256 " + p.getSignedPdfHash().substring(0, 16) + "…");
 
-        String body = "<p>Hi " + MailService.esc(p.getClientName()) + ",</p>"
-                + "<p>Thank you! <b>" + MailService.esc(p.getTitle()) + "</b> (" + p.getNumber()
-                + ") has been signed by both parties. A copy of the signed agreement is attached.</p>"
-                + (p.paymentDue() ? "<p>You can pay the advance online from the same link.</p>" : "");
-        List<String> to = props.mailFrom() == null || props.mailFrom().isBlank()
-                ? List.of(p.getClientEmail()) : List.of(p.getClientEmail(), props.mailFrom());
-        mail.send(to, "Signed: " + p.getTitle() + " (" + p.getNumber() + ")",
-                mail.layout("Agreement signed", body, "View agreement", signingUrl(p)),
-                new MailService.Attachment(p.getNumber() + "-signed.pdf", finalPdf, "application/pdf"));
+        List<String> to = mail.fromAddress().isBlank()
+                ? List.of(p.getClientEmail()) : List.of(p.getClientEmail(), mail.fromAddress());
+        MailService.Result mailed = emailSignedAgreement(p, to);
+        log(p, mailed.sent() ? "SIGNED_COPY_EMAILED" : "SIGNED_COPY_NOT_EMAILED", Actor.SYSTEM, null,
+                mailed.sent() ? "Emailed to " + String.join(", ", to) : mailed.error());
         return p;
     }
 

@@ -74,5 +74,5 @@ final class ProposalDtos {
 
     record PageView<T>(List<T> items, int page, int size, long total) {}
 
-    record SendResponse(AdminProposalView proposal, boolean emailSent, String signingUrl) {}
+    record SendResponse(AdminProposalView proposal, boolean emailSent, String emailError, String signingUrl) {}
 }

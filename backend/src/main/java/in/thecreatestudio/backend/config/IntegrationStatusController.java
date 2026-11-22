@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class IntegrationStatusController {
 
-    record Status(boolean emailConfigured, boolean paymentsConfigured, String publicBaseUrl) {}
+    record Status(boolean emailConfigured, String emailProblem, boolean paymentsConfigured, String publicBaseUrl) {}
 
     private final ProposalService proposals;
     private final PaymentService payments;
@@ -23,6 +23,7 @@ class IntegrationStatusController {
 
     @GetMapping("/api/admin/integrations")
     Status status() {
-        return new Status(proposals.mailConfigured(), payments.enabled(), props.baseUrl());
+        String emailProblem = proposals.mailProblem();
+        return new Status(emailProblem == null, emailProblem, payments.enabled(), props.baseUrl());
     }
 }

@@ -1,13 +1,22 @@
 package in.thecreatestudio.backend.mail;
 
 import in.thecreatestudio.backend.config.AppProperties;
+import jakarta.mail.AuthenticationFailedException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.SendFailedException;
 import jakarta.mail.internet.MimeMessage;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.env.Environment;
+import org.springframework.mail.MailAuthenticationException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -34,38 +43,90 @@ public class MailService {
         this.env = env;
     }
 
-    public boolean isConfigured() {
-        String host = env.getProperty("spring.mail.host");
+    /** Outcome of a send. {@code error} is safe to show to the admin (never contains credentials). */
+    public record Result(boolean sent, String error) {}
+
+    /** @return what is missing from the server's email settings, or null when email can be used. */
+    public String configurationProblem() {
+        if (blank(env.getProperty("spring.mail.host"))) return "MAIL_HOST is empty on the server.";
+        if (blank(env.getProperty("spring.mail.username"))) return "MAIL_USERNAME is empty on the server.";
         String password = env.getProperty("spring.mail.password");
-        boolean passwordSet = password != null && !password.isBlank() && !password.startsWith("PASTE_") && !password.startsWith("your-");
-        return host != null && !host.isBlank() && passwordSet
-                && props.mailFrom() != null && !props.mailFrom().isBlank()
-                && sender.getIfAvailable() != null;
+        if (blank(password) || password.startsWith("PASTE_") || password.startsWith("your-")) {
+            return "MAIL_PASSWORD is empty or still the placeholder on the server.";
+        }
+        if (sender.getIfAvailable() == null) return "The mail sender could not start.";
+        return null;
     }
 
-    /** @return true only if the SMTP server accepted the message. */
-    public boolean send(List<String> to, String subject, String html, Attachment attachment) {
-        if (!isConfigured()) {
-            log.info("Email not sent (SMTP not configured): '{}' to {}", subject, to);
-            return false;
+    public boolean isConfigured() {
+        return configurationProblem() == null;
+    }
+
+    /** MAIL_FROM, or the SMTP login when that is left empty (Gmail requires them to match anyway). */
+    public String fromAddress() {
+        return blank(props.mailFrom()) ? env.getProperty("spring.mail.username", "") : props.mailFrom();
+    }
+
+    /** Successful only if the SMTP server accepted the message. */
+    public Result send(List<String> to, String subject, String text, String html, Attachment attachment) {
+        String problem = configurationProblem();
+        if (problem != null) {
+            log.info("Email '{}' not sent: {}", subject, problem);
+            return new Result(false, problem);
         }
         try {
             JavaMailSender mailSender = sender.getObject();
             MimeMessage msg = mailSender.createMimeMessage();
-            MimeMessageHelper h = new MimeMessageHelper(msg, attachment != null, "UTF-8");
-            h.setFrom(props.mailFrom(), props.companyName());
+            MimeMessageHelper h = new MimeMessageHelper(msg, true, "UTF-8");
+            h.setFrom(fromAddress(), props.companyName());
             h.setTo(to.toArray(String[]::new));
             h.setSubject(subject);
-            h.setText(html, true);
+            h.setText(text, html); // plain-text part as well: HTML-only mail is more likely to be marked as spam
             if (attachment != null) {
                 h.addAttachment(attachment.filename(), new ByteArrayResource(attachment.data()), attachment.contentType());
             }
             mailSender.send(msg);
-            return true;
+            return new Result(true, null);
         } catch (Exception e) {
             log.error("Failed to send email '{}' to {}", subject, to, e);
-            return false;
+            return new Result(false, describe(e));
         }
+    }
+
+    /** Turns an SMTP failure into something the admin can act on. */
+    static String describe(Exception failure) {
+        List<Throwable> chain = new ArrayList<>();
+        collect(failure, chain);
+        if (has(chain, MailAuthenticationException.class) || has(chain, AuthenticationFailedException.class)) {
+            return "The mail server rejected the login. Create a new Gmail App Password, put it in MAIL_PASSWORD "
+                    + "without spaces, then restart the backend.";
+        }
+        if (has(chain, UnknownHostException.class)) return "The mail server address was not found. Check MAIL_HOST.";
+        if (has(chain, SocketTimeoutException.class)) return "The mail server did not answer in time. Try again in a minute.";
+        if (has(chain, ConnectException.class)) {
+            return "The server could not connect to the mail server. Check MAIL_PORT (587) and the hosting firewall.";
+        }
+        if (has(chain, SendFailedException.class)) return "The mail server refused the recipient. Check the client's email address.";
+        Throwable last = chain.get(chain.size() - 1);
+        String detail = String.valueOf(last.getMessage()).replaceAll("\\s+", " ").trim();
+        return "The mail server refused the message: " + detail.substring(0, Math.min(detail.length(), 180));
+    }
+
+    private static void collect(Throwable t, List<Throwable> out) {
+        if (t == null || out.contains(t)) return;
+        out.add(t);
+        // Both of these keep the real cause somewhere other than getCause().
+        if (t instanceof MailSendException m) for (Exception e : m.getMessageExceptions()) collect(e, out);
+        if (t instanceof MessagingException m) collect(m.getNextException(), out);
+        collect(t.getCause(), out);
+    }
+
+    private static boolean has(List<Throwable> chain, Class<? extends Throwable> type) {
+        return chain.stream().anyMatch(type::isInstance);
+    }
+
+    private static boolean blank(String s) {
+        return s == null || s.isBlank();
     }
 
     /** Minimal branded HTML wrapper for emails. */

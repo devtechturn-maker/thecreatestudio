@@ -39,6 +39,12 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+      # Never send the password over an unencrypted connection.
+      mail.smtp.starttls.required: ${MAIL_STARTTLS_REQUIRED:true}
+      # JavaMail waits forever by default, which left requests hanging.
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 15000
+      mail.smtp.writetimeout: 15000
 
 app:
   # Public URL of the website — used to build client signing links in emails.
@@ -68,6 +74,10 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    # A Gmail problem must not mark the whole backend DOWN and fail deploys.
+    mail:
+      enabled: false
 
 logging:
   level:

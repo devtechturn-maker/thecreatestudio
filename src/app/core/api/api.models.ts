@@ -99,6 +99,7 @@ export interface PageView<T> {
 export interface SendResponse {
   proposal: AdminProposal;
   emailSent: boolean;
+  emailError: string | null;
   signingUrl: string;
 }
 

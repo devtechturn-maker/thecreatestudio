@@ -66,7 +66,7 @@ class AdminProposalController {
     @PostMapping("/{id}/send")
     SendResponse send(@PathVariable UUID id, HttpServletRequest req) {
         ProposalService.SendResult r = service.send(id, ClientInfo.from(req));
-        return new SendResponse(view(r.proposal()), r.emailSent(), r.signingUrl());
+        return new SendResponse(view(r.proposal()), r.emailSent(), r.emailError(), r.signingUrl());
     }
 
     @PostMapping("/{id}/resend-email")

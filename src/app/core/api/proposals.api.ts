@@ -59,8 +59,8 @@ export class AdminProposalsApi {
     return this.http.post<AdminProposal>(`${this.base}/${id}/share`, { channel });
   }
 
-  integrations(): Observable<{ emailConfigured: boolean; paymentsConfigured: boolean; publicBaseUrl: string }> {
-    return this.http.get<{ emailConfigured: boolean; paymentsConfigured: boolean; publicBaseUrl: string }>(
+  integrations(): Observable<{ emailConfigured: boolean; emailProblem: string | null; paymentsConfigured: boolean; publicBaseUrl: string }> {
+    return this.http.get<{ emailConfigured: boolean; emailProblem: string | null; paymentsConfigured: boolean; publicBaseUrl: string }>(
       `${environment.apiBase}/admin/integrations`,
     );
   }

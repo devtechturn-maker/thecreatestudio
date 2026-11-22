@@ -21,10 +21,10 @@ import { IconComponent } from '../../shared/components/icon.component';
           <span><strong>WhatsApp</strong><small>Choose who to send it to</small></span>
         </a>
 
-        @if (emailConfigured() && !signed()) {
+        @if (emailConfigured()) {
           <button type="button" class="ch" (click)="sendEmail()" [disabled]="sending()">
             <app-icon name="mail" [size]="22" />
-            <span><strong>{{ sending() ? 'Sending…' : 'Send email' }}</strong><small>From the website to {{ proposal().clientEmail }}</small></span>
+            <span><strong>{{ sending() ? 'Sending…' : signed() ? 'Email signed PDF' : 'Send email' }}</strong><small>From the website to {{ proposal().clientEmail }}</small></span>
           </button>
         }
 
@@ -38,8 +38,8 @@ import { IconComponent } from '../../shared/components/icon.component';
           <span><strong>{{ copied() ? 'Copied!' : 'Copy message' }}</strong><small>Paste anywhere</small></span>
         </button>
       </div>
-      @if (!emailConfigured() && !signed()) {
-        <p class="hint">Website email (SMTP) isn't set up, so "Send email" is hidden. "Email app" still works.</p>
+      @if (!emailConfigured() && emailProblem()) {
+        <p class="hint" role="status">Website email is off: {{ emailProblem() }} "Email app" still works.</p>
       }
       @if (status()) { <p class="ok" role="status">{{ status() }}</p> }
       @if (error()) { <p class="adm-alert" role="alert">{{ error() }}</p> }
@@ -75,6 +75,7 @@ import { IconComponent } from '../../shared/components/icon.component';
 export class SharePanelComponent {
   readonly proposal = input.required<AdminProposal>();
   readonly emailConfigured = input(false);
+  readonly emailProblem = input('');
   /** Emits the updated proposal after a share is recorded (refreshes the activity log). */
   readonly updated = output<AdminProposal>();
 
@@ -122,13 +123,14 @@ export class SharePanelComponent {
     this.status.set('');
     this.api.resendEmail(this.proposal().id).subscribe({
       next: () => {
-        this.status.set(`Email sent to ${this.proposal().clientEmail}.`);
+        this.status.set(`Email sent to ${this.proposal().clientEmail}. If it is not in the inbox, check the spam folder.`);
         this.sending.set(false);
         this.refresh();
       },
       error: (e) => {
         this.error.set(apiError(e));
         this.sending.set(false);
+        this.refresh();
       },
     });
   }

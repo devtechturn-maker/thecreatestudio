@@ -35,7 +35,7 @@
       }
 
       @if (p.signingUrl && p.status !== 'CANCELLED') {
-        <app-share-panel [proposal]="p" [emailConfigured]="emailConfigured()" (updated)="this.p.set($event)" />
+        <app-share-panel [proposal]="p" [emailConfigured]="emailConfigured()" [emailProblem]="emailProblem()" (updated)="this.p.set($event)" />
       }
 
       @if (p.status === 'SIGNED') {
