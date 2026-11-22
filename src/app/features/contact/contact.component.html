@@ -87,9 +87,9 @@
             </div>
             <div class="field">
               <label for="phone">Phone Number <span class="req">*</span></label>
-              <input id="phone" type="tel" class="input" formControlName="phone" autocomplete="tel" inputmode="tel" placeholder="+91 98765 43210"
+              <input id="phone" type="tel" class="input" formControlName="phone" appMobileNumber autocomplete="tel-national" placeholder="10-digit mobile number"
                      [class.is-invalid]="invalid('phone')" [attr.aria-invalid]="invalid('phone')" aria-describedby="phone-err" />
-              @if (invalid('phone')) { <span id="phone-err" class="error-msg" role="alert">Enter a valid 10-digit Indian mobile number (optionally with +91).</span> }
+              @if (invalid('phone')) { <span id="phone-err" class="error-msg" role="alert">Enter a 10-digit mobile number starting with 6, 7, 8 or 9.</span> }
             </div>
           </div>
 

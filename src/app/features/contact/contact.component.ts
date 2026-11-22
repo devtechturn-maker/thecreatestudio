@@ -7,6 +7,7 @@ import { IconComponent } from '../../shared/components/icon.component';
 import { DropdownComponent } from '../../shared/components/dropdown/dropdown.component';
 import { SocialLinksComponent } from '../../shared/components/social-links/social-links.component';
 import { describeSocialLinks, socialLinksValidator } from '../../shared/components/social-links/social-links.util';
+import { MOBILE_PATTERN, MobileNumberDirective } from '../../shared/directives/mobile-number.directive';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { Web3FormsService } from '../../core/services/web3forms.service';
 import { BUDGETS, CONTACT_SERVICES, SOCIAL_SERVICES } from '../../core/config/services.data';
@@ -17,7 +18,7 @@ const COOLDOWN_MS = 60_000;
 
 @Component({
   selector: 'app-contact',
-  imports: [ReactiveFormsModule, IconComponent, RevealDirective, DropdownComponent, SocialLinksComponent],
+  imports: [ReactiveFormsModule, IconComponent, RevealDirective, DropdownComponent, SocialLinksComponent, MobileNumberDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
@@ -45,8 +46,8 @@ export class ContactComponent {
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
     company: ['', [Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email, Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)]],
-    // Indian mobile: optional +91 / 91 / 0 prefix, then 10 digits starting 6-9.
-    phone: ['', [Validators.required, Validators.pattern(/^(?:\+?91[\s-]?|0)?[6-9]\d{4}[\s-]?\d{5}$/)]],
+    // Indian mobile: exactly 10 digits starting 6-9.
+    phone: ['', [Validators.required, Validators.pattern(MOBILE_PATTERN)]],
     service_required: this.fb.nonNullable.control<string[]>([], Validators.required), // an empty list is invalid
     social_links: this.fb.nonNullable.control<string[]>(['']), // validated only while needsSocial is true
     project_budget: ['', Validators.required],

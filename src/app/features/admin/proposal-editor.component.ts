@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AdminProposalsApi } from '../../core/api/proposals.api';
+import { MOBILE_PATTERN, MobileNumberDirective, toMobileDigits } from '../../shared/directives/mobile-number.directive';
 import { ProposalContent, apiError, formatINR } from '../../core/api/api.models';
 
 /** Default terms — a starting point only. Review with a legal professional. */
@@ -20,7 +21,7 @@ const DEFAULT_TERMS = `1. Scope: Work is limited to the deliverables listed in t
 
 @Component({
   selector: 'app-proposal-editor',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MobileNumberDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="adm-head">
@@ -38,7 +39,9 @@ const DEFAULT_TERMS = `1. Scope: Work is limited to the deliverables listed in t
         </div>
         <div class="row">
           <div class="field"><label for="clientEmail">Client email *</label><input id="clientEmail" type="email" class="input" formControlName="clientEmail" /></div>
-          <div class="field"><label for="clientPhone">Client phone</label><input id="clientPhone" type="tel" class="input" formControlName="clientPhone" /></div>
+          <div class="field"><label for="clientPhone">Client phone</label><input id="clientPhone" type="tel" class="input" formControlName="clientPhone" appMobileNumber placeholder="10-digit mobile number" />
+            @if (form.controls.clientPhone.touched && form.controls.clientPhone.invalid) { <span class="error-msg" role="alert">Enter a 10-digit mobile number starting with 6, 7, 8 or 9.</span> }
+          </div>
         </div>
       </fieldset>
 
@@ -118,7 +121,7 @@ export class ProposalEditorComponent {
     clientName: ['', [Validators.required, Validators.maxLength(120)]],
     clientCompany: ['', Validators.maxLength(160)],
     clientEmail: ['', [Validators.required, Validators.email]],
-    clientPhone: ['', Validators.pattern(/^$|^[0-9+()\-\s]{7,30}$/)],
+    clientPhone: ['', Validators.pattern(MOBILE_PATTERN)], // optional: pattern ignores an empty value
     title: ['', [Validators.required, Validators.maxLength(200)]],
     summary: ['', Validators.required],
     scope: ['', Validators.required],
@@ -151,7 +154,7 @@ export class ProposalEditorComponent {
           }
           this.form.setValue({
             clientName: p.clientName, clientCompany: p.clientCompany ?? '', clientEmail: p.clientEmail,
-            clientPhone: p.clientPhone ?? '', title: p.title, summary: p.summary, scope: p.scope,
+            clientPhone: toMobileDigits(p.clientPhone ?? ''), title: p.title, summary: p.summary, scope: p.scope,
             amount: p.amountPaise / 100, advance: p.advancePaise / 100, validUntil: p.validUntil ?? '', terms: p.terms,
           });
         },
