@@ -7,7 +7,7 @@
       <span class="line"><span class="grad-text">visible.</span></span>
     </h1>
     <p class="lead" appReveal>A showcase across digital marketing, branding, social media creatives, websites, mobile apps and UI/UX design.</p>
-    <p class="notice demo-note" appReveal>All projects currently shown are <strong>demo concepts</strong> created to illustrate our capabilities — not real client work. Real projects will be added soon.</p>
+    <p class="notice demo-note" appReveal>Projects marked <strong>Demo</strong> are sample concepts that illustrate our capabilities, not client work.</p>
   </div>
 </section>
 
@@ -27,7 +27,7 @@
         <li class="pcard" [class.pcard--tall]="p.size === 'tall'" [class.pcard--wide]="p.size === 'wide'">
           <button type="button" class="pcard__btn" (click)="open(p)" data-cursor="view" [attr.aria-label]="'View project: ' + p.title">
             <div class="pcard__media">
-              <img [src]="p.image" [alt]="p.title + ' — demo project preview'" loading="lazy" width="800" height="600" />
+              <img [src]="p.image" [alt]="p.title + (p.demo ? ' — demo project preview' : ' — website preview')" loading="lazy" width="800" height="600" />
               <div class="pcard__overlay" aria-hidden="true"><span class="pcard__view">View Project <app-icon name="arrowUpRight" [size]="18" /></span></div>
             </div>
             <div class="pcard__info">
@@ -51,7 +51,7 @@
   @if (selected(); as p) {
     <div class="modal__box">
       <button type="button" class="modal__close" (click)="close()" aria-label="Close project details"><app-icon name="close" /></button>
-      <div class="modal__media"><img [src]="p.image" [alt]="p.title + ' — demo project preview'" width="800" height="600" /></div>
+      <div class="modal__media"><img [src]="p.image" [alt]="p.title + (p.demo ? ' — demo project preview' : ' — website preview')" width="800" height="600" /></div>
       <div class="modal__body">
         <div class="chips">
           <span class="chip">{{ p.category }}</span>

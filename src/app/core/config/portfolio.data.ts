@@ -1,8 +1,8 @@
 /**
  * PORTFOLIO DATA — add, edit or remove projects here.
  *
- * Every entry below is a clearly marked DEMO project (`demo: true`). They are
- * not real clients. Replace them with your real work and set `demo: false`.
+ * Real client work has `demo: false`. Entries with `demo: true` are sample
+ * concepts, labelled "Demo" on the site; replace them as real work is added.
  *
  * Images: put files in /public/assets/projects/ and reference them as
  * 'assets/projects/your-image.jpg'.
@@ -39,6 +39,20 @@ export interface Project {
 }
 
 export const PROJECTS: Project[] = [
+  {
+    slug: 'shootzone',
+    title: 'ShootZone Photography',
+    category: 'Website Development',
+    image: 'assets/projects/shootzone.jpg',
+    summary: 'Portfolio website for a wedding photography studio in Ahmedabad.',
+    details:
+      'An elegant, image-first website that shows ShootZone’s wedding work through galleries and couple stories, with an enquiry form and WhatsApp chat so couples can book their date.',
+    technologies: ['Responsive Website', 'Photo Galleries', 'Wedding Stories', 'Enquiry Form', 'WhatsApp Chat'],
+    liveUrl: 'https://shootzone.in/',
+    featured: true,
+    size: 'wide',
+    demo: false,
+  },
   {
     slug: 'demo-cafe-social',
     title: 'Café Social Launch',
